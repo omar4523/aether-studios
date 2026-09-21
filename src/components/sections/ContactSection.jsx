@@ -26,7 +26,7 @@ export default function ContactSection({ onNavigate }) {
     <section id="contact" className="relative pt-24 pb-12 bg-[#FFFFFF] text-slate-900 border-t border-slate-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
-        {/* Section Header with 3D Purple Crystal from Design */}
+        {/* Section Header with 3D Headphones from Design */}
         <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-6 mb-16">
           <div className="max-w-2xl text-left">
             <div className="text-[11px] font-mono tracking-widest text-slate-500 uppercase font-bold mb-2">
@@ -41,13 +41,13 @@ export default function ContactSection({ onNavigate }) {
             </p>
           </div>
 
-          {/* 3D Purple Crystal Graphic from Design */}
+          {/* 3D Chrome Headphones Graphic from Design */}
           <div className="hidden lg:flex items-center justify-center pr-8 pointer-events-none">
-            <div className="relative w-32 h-32 flex items-center justify-center drop-shadow-2xl">
+            <div className="relative w-36 h-36 flex items-center justify-center drop-shadow-2xl">
               <img 
-                src="/aether_crystal_purple.jpg" 
-                alt="3D Purple Crystal" 
-                className="w-full h-full object-cover rounded-3xl animate-float-slow shadow-[0_0_35px_rgba(168,85,247,0.35)] border border-white/40" 
+                src="/aether_headphones.jpg" 
+                alt="3D Studio Headphones" 
+                className="w-full h-full object-cover rounded-3xl animate-float-slow shadow-[0_0_35px_rgba(0,242,254,0.35)] border border-white/40" 
               />
             </div>
           </div>
@@ -77,39 +77,55 @@ export default function ContactSection({ onNavigate }) {
               </div>
             </div>
 
-            {/* 2. WhatsApp Card */}
+            {/* 2. Phone Card from Design */}
             <div className="p-6 rounded-3xl bg-[#F8FAFC] border border-slate-200/90 shadow-sm flex items-start gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+              <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
                 <MessageCircle className="w-5 h-5" />
               </div>
               <div>
                 <span className="text-[11px] font-mono text-slate-400 uppercase tracking-wider block font-bold">
-                  WhatsApp
+                  Phone / WhatsApp
                 </span>
-                <a href="https://wa.me/201012345678" target="_blank" rel="noreferrer" className="text-base font-display font-bold text-slate-950 hover:text-emerald-600 transition-colors">
-                  +20 10 1234 5678
+                <a href="tel:+20123456789" className="text-base font-display font-bold text-slate-950 hover:text-indigo-600 transition-colors">
+                  +20 123 456 789
                 </a>
                 <p className="text-xs text-slate-500 mt-1">
-                  Quickest way to reach us.
+                  Mon - Fri, 9AM - 6PM EET (Cairo Time)
                 </p>
               </div>
             </div>
 
-            {/* 3. Location Card */}
-            <div className="p-6 rounded-3xl bg-[#F8FAFC] border border-slate-200/90 shadow-sm flex items-start gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
-                <MapPin className="w-5 h-5" />
+            {/* 3. Location & Cairo Map Card from Design */}
+            <div className="p-6 rounded-3xl bg-[#F8FAFC] border border-slate-200/90 shadow-sm space-y-4">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
+                  <MapPin className="w-5 h-5" />
+                </div>
+                <div>
+                  <span className="text-[11px] font-mono text-slate-400 uppercase tracking-wider block font-bold">
+                    Location
+                  </span>
+                  <h4 className="text-base font-display font-bold text-slate-950">
+                    Cairo, Egypt
+                  </h4>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Remote & global clients welcome worldwide.
+                  </p>
+                </div>
               </div>
-              <div>
-                <span className="text-[11px] font-mono text-slate-400 uppercase tracking-wider block font-bold">
-                  Location
-                </span>
-                <h4 className="text-base font-display font-bold text-slate-950">
-                  Cairo, Egypt
-                </h4>
-                <p className="text-xs text-slate-500 mt-1">
-                  Remote & global clients welcome.
-                </p>
+
+              {/* Stylized Modern Cairo Map Visual */}
+              <div className="relative rounded-2xl overflow-hidden bg-slate-950 p-4 border border-slate-800 text-slate-300">
+                <div className="flex items-center justify-between text-[10px] font-mono text-cyan-300 mb-2">
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                    <span>CAIRO HQ • ACTIVE HUB</span>
+                  </span>
+                  <span className="text-slate-400">30.0444° N, 31.2357° E</span>
+                </div>
+                <div className="text-[11px] text-slate-400 leading-relaxed font-sans">
+                  Operating from Egypt's vibrant technology corridor, serving students and global companies across North America, Europe, and the Middle East.
+                </div>
               </div>
             </div>
 
@@ -226,6 +242,7 @@ export default function ContactSection({ onNavigate }) {
             <button onClick={() => onNavigate('portfolio')} className="hover:text-slate-900">Portfolio</button>
             <button onClick={() => onNavigate('about')} className="hover:text-slate-900">About</button>
             <button onClick={() => onNavigate('pricing')} className="hover:text-slate-900">Pricing</button>
+            <button onClick={() => onNavigate('resources')} className="hover:text-slate-900">Resources</button>
             <button onClick={() => onNavigate('contact')} className="hover:text-slate-900">Contact</button>
           </nav>
 

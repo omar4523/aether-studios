@@ -28,6 +28,7 @@ export default function Navbar({ onOpenIntake, activeSection, onNavigate }) {
     { id: 'portfolio', label: 'Portfolio' },
     { id: 'about', label: 'About' },
     { id: 'pricing', label: 'Pricing' },
+    { id: 'resources', label: 'Resources' },
     { id: 'contact', label: 'Contact' },
   ];
 

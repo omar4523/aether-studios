@@ -32,16 +32,16 @@ export default function ServicesSection({ onSelectService }) {
         <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-6 mb-16">
           <div className="max-w-2xl text-left">
             <div className="text-[11px] font-mono tracking-widest text-slate-500 uppercase font-bold mb-2">
-              — OUR SERVICES
+              — SERVICES
             </div>
             <h2 className="text-3xl sm:text-5xl font-display font-extrabold text-slate-950 tracking-tight mb-4">
-              Productized Solutions <br />
+              Turn Your Ideas Into <br />
               <span className="text-slate-900">
-                for Real-World Needs
+                Real Products
               </span>
             </h2>
             <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-normal">
-              Choose from our ready-to-go services or get a custom solution built around your vision.
+              We specialize in turning complex ideas into functional, beautifully designed digital products. Whether you're an ambitious student, a thriving business, or an early-stage startup, we're here to build.
             </p>
           </div>
 
@@ -57,45 +57,45 @@ export default function ServicesSection({ onSelectService }) {
           </div>
         </div>
 
-        {/* 6 Services Grid from Design */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
+        {/* 6 Services Grid from Design (3x2 on desktop) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {servicesData.map((svc) => {
             const Icon = iconMap[svc.icon] || Layers;
             return (
               <div 
                 key={svc.id}
-                className="bg-white rounded-3xl p-8 border border-slate-200/90 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group text-left"
+                className="bg-white rounded-3xl p-7 border border-slate-200/90 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group text-left"
               >
                 <div>
                   {/* Icon & Heading */}
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 group-hover:scale-105 transition-transform">
+                  <div className="flex items-center gap-3.5 mb-4">
+                    <div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 group-hover:scale-105 transition-transform shrink-0">
                       <Icon className="w-6 h-6" />
                     </div>
                     <div>
-                      <h3 className="text-xl font-display font-bold text-slate-950">
+                      <h3 className="text-lg font-display font-bold text-slate-950 leading-tight">
                         {svc.title}
                       </h3>
-                      <div className="text-xs font-mono text-slate-500 font-semibold mt-0.5">
+                      <div className="text-[11px] font-mono text-slate-500 font-semibold mt-0.5">
                         Starting {svc.startingPrice} • {svc.turnaround}
                       </div>
                     </div>
                   </div>
 
                   {/* Checklist from Design */}
-                  <ul className="space-y-2.5 my-6">
+                  <ul className="space-y-2.5 my-5">
                     {svc.features.map((feat, idx) => (
-                      <li key={idx} className="flex items-center gap-2.5 text-xs sm:text-sm text-slate-600">
-                        <div className="rounded-full p-0.5 text-blue-600">
-                          <Check className="w-4 h-4 stroke-[2.5]" />
+                      <li key={idx} className="flex items-center gap-2.5 text-xs text-slate-600">
+                        <div className="rounded-full p-0.5 text-blue-600 shrink-0">
+                          <Check className="w-3.5 h-3.5 stroke-[2.5]" />
                         </div>
-                        <span>{feat}</span>
+                        <span className="line-clamp-1">{feat}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
 
-                {/* Card Link from Design */}
+                {/* Card Link from Design (Learn More →) */}
                 <button
                   onClick={() => {
                     soundEffects.playClick();
@@ -104,7 +104,7 @@ export default function ServicesSection({ onSelectService }) {
                   onMouseEnter={() => soundEffects.playHover()}
                   className="flex items-center gap-2 text-xs font-display font-bold text-slate-900 group-hover:text-blue-600 transition-colors pt-4 border-t border-slate-100 w-fit"
                 >
-                  <span>Get Started</span>
+                  <span>Learn More</span>
                   <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                 </button>
               </div>

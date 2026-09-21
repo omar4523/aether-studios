@@ -5,24 +5,24 @@ import { soundEffects } from '../../utils/soundFx';
 export default function AboutSection({ onOpenIntake }) {
   const values = [
     {
+      icon: Lightbulb,
+      title: "Innovation",
+      description: "We stay ahead of the curve, exploring new technologies.",
+    },
+    {
       icon: ShieldCheck,
       title: "Quality",
-      description: "We deliver excellence in everything we build.",
+      description: "Every line of code and pixel of design is crafted with precision.",
     },
     {
       icon: Zap,
-      title: "Speed",
-      description: "We move fast without compromising quality.",
-    },
-    {
-      icon: Lightbulb,
-      title: "Innovation",
-      description: "We use the latest tech to solve real problems.",
+      title: "Transparency",
+      description: "No surprises. Clear timelines, clear pricing, and regular updates.",
     },
     {
       icon: Heart,
-      title: "Client First",
-      description: "Your success is our success.",
+      title: "Community",
+      description: "We believe in empowering learners and supporting the builder community.",
     },
   ];
 
@@ -30,46 +30,59 @@ export default function AboutSection({ onOpenIntake }) {
     <section id="about" className="relative py-24 bg-[#F8FAFC] text-slate-900 border-t border-slate-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
-        {/* Section Header from Design */}
-        <div className="text-left max-w-3xl mb-16">
-          <div className="text-[11px] font-mono tracking-widest text-slate-500 uppercase font-bold mb-2">
-            — ABOUT AETHER STUDIOS
+        {/* Section Header with 3D Kinetic Gyroscope from Design */}
+        <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-8 mb-16">
+          <div className="text-left max-w-3xl">
+            <div className="text-[11px] font-mono tracking-widest text-slate-500 uppercase font-bold mb-2">
+              — ABOUT AETHER STUDIOS
+            </div>
+            <h2 className="text-3xl sm:text-5xl font-display font-extrabold text-slate-950 tracking-tight mb-4">
+              More Than Just Code. <br />
+              <span className="text-slate-900">We Build Futures.</span>
+            </h2>
+            <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-normal max-w-2xl">
+              We're a modern digital studio focused on turning ideas into impactful products. With a passion for technology, design and problem solving, we help students, businesses and startups take their next step — faster.
+            </p>
+
+            {/* Inline Stats Row from Design */}
+            <div className="grid grid-cols-3 gap-6 pt-8 mt-8 border-t border-slate-200 max-w-lg">
+              <div>
+                <div className="text-2xl sm:text-3xl font-display font-extrabold text-slate-950">
+                  140+
+                </div>
+                <div className="text-xs text-slate-500 font-mono mt-0.5">
+                  Projects Delivered
+                </div>
+              </div>
+
+              <div>
+                <div className="text-2xl sm:text-3xl font-display font-extrabold text-slate-950">
+                  48h
+                </div>
+                <div className="text-xs text-slate-500 font-mono mt-0.5">
+                  Avg. Turnaround
+                </div>
+              </div>
+
+              <div>
+                <div className="text-2xl sm:text-3xl font-display font-extrabold text-slate-950">
+                  99.6%
+                </div>
+                <div className="text-xs text-slate-500 font-mono mt-0.5">
+                  Client Satisfaction
+                </div>
+              </div>
+            </div>
           </div>
-          <h2 className="text-3xl sm:text-5xl font-display font-extrabold text-slate-950 tracking-tight mb-4">
-            More Than Just Code. <br />
-            <span className="text-slate-900">We Build Futures.</span>
-          </h2>
-          <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-normal max-w-2xl">
-            We're a modern digital studio focused on turning ideas into impactful products. With a passion for technology, design and problem solving, we help students, businesses and startups take their next step — faster.
-          </p>
 
-          {/* Inline Stats Row from Design */}
-          <div className="grid grid-cols-3 gap-6 pt-8 mt-8 border-t border-slate-200 max-w-lg">
-            <div>
-              <div className="text-2xl sm:text-3xl font-display font-extrabold text-slate-950">
-                140+
-              </div>
-              <div className="text-xs text-slate-500 font-mono mt-0.5">
-                Projects Delivered
-              </div>
-            </div>
-
-            <div>
-              <div className="text-2xl sm:text-3xl font-display font-extrabold text-slate-950">
-                48h
-              </div>
-              <div className="text-xs text-slate-500 font-mono mt-0.5">
-                Avg. Turnaround
-              </div>
-            </div>
-
-            <div>
-              <div className="text-2xl sm:text-3xl font-display font-extrabold text-slate-950">
-                99.6%
-              </div>
-              <div className="text-xs text-slate-500 font-mono mt-0.5">
-                Client Satisfaction
-              </div>
+          {/* 3D Kinetic Gyroscope Graphic from Design */}
+          <div className="hidden lg:flex items-center justify-center pr-8 pointer-events-none shrink-0">
+            <div className="relative w-36 h-36 flex items-center justify-center drop-shadow-2xl">
+              <img 
+                src="/aether_gyroscope.jpg" 
+                alt="3D Kinetic Gyroscope" 
+                className="w-full h-full object-cover rounded-3xl animate-float-slow shadow-[0_0_35px_rgba(0,242,254,0.3)] border border-white/40" 
+              />
             </div>
           </div>
         </div>

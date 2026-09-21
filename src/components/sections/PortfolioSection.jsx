@@ -44,20 +44,16 @@ export default function PortfolioSection({ onOpenIntake }) {
         {/* Section Header with 3D Holographic Torus */}
         <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-8 mb-14">
           <div className="max-w-2xl text-left">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-[11px] font-mono uppercase font-bold mb-4">
-              <span className="w-2 h-2 rounded-full bg-blue-600 animate-ping" />
-              <span>— OUR WORK & CASE STUDIES</span>
+            <div className="text-[11px] font-mono tracking-widest text-slate-500 uppercase font-bold mb-2">
+              — OUR WORK
             </div>
             
-            <h2 className="text-3xl sm:text-5xl lg:text-6xl font-display font-extrabold text-slate-950 tracking-tight mb-4">
-              Featured Projects <br />
-              <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 bg-clip-text text-transparent">
-                Engineered to Perfection.
-              </span>
+            <h2 className="text-3xl sm:text-5xl font-display font-extrabold text-slate-950 tracking-tight mb-4">
+              Featured Projects
             </h2>
             
             <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-normal max-w-xl">
-              Real solutions. Real results. Explore production web apps, e-commerce storefronts, mobile apps, and university capstones designed and launched by our team.
+              Real solutions. Real results. Explore a selection of our recent work across different industries.
             </p>
           </div>
 
@@ -74,7 +70,7 @@ export default function PortfolioSection({ onOpenIntake }) {
         </div>
 
         {/* Filter Pills with Counts */}
-        <div className="flex flex-wrap items-center gap-2.5 mb-14">
+        <div className="flex flex-wrap items-center gap-2.5 mb-12">
           {portfolioCategories.map((cat) => {
             const count = cat.id === 'all' 
               ? portfolioData.length 
@@ -104,111 +100,111 @@ export default function PortfolioSection({ onOpenIntake }) {
           })}
         </div>
 
-        {/* Studio-Grade Showcase Grid (2 Columns) */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-20">
-          {filteredProjects.map((proj) => (
-            <div
-              key={proj.id}
-              onClick={() => handleOpenDetail(proj)}
-              onMouseEnter={() => soundEffects.playHover()}
-              className="group bg-[#F8FAFC] hover:bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-2xl transition-all duration-300 overflow-hidden cursor-pointer flex flex-col justify-between text-left"
-            >
-              {/* Browser / Device Chrome Header */}
-              <div className="px-5 py-3.5 bg-slate-900 border-b border-slate-800 flex items-center justify-between text-[11px] font-mono text-slate-400">
-                <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
-                  <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80" />
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
-                  <span className="ml-2 text-slate-300 font-semibold truncate max-w-[200px]">
-                    {proj.title}
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/10 text-cyan-300 font-mono">
-                    {proj.duration}
-                  </span>
-                </div>
-              </div>
-
-              {/* Realistic Software Screenshot with Interactive Hover Reveal */}
-              <div className="relative aspect-[16/10] overflow-hidden bg-slate-950 group">
-                <img 
-                  src={proj.image} 
-                  alt={proj.title} 
-                  className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700" 
-                />
-
-                {/* Ambient Dark Gradient Sheen */}
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity" />
-
-                {/* Floating Outcome Metric Pill */}
-                <div className="absolute bottom-4 left-4 z-10">
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-950/85 backdrop-blur-md border border-emerald-500/40 text-emerald-400 text-xs font-mono font-bold shadow-lg">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>{proj.metrics}</span>
-                  </div>
-                </div>
-
-                {/* Quick View Button on Hover */}
-                <div className="absolute bottom-4 right-4 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <div className="px-3.5 py-1.5 rounded-xl bg-blue-600 text-white text-xs font-display font-bold shadow-lg flex items-center gap-1.5">
-                    <Eye className="w-3.5 h-3.5" />
-                    <span>Explore Case Study</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Card Details Body */}
-              <div className="p-7 flex flex-col justify-between flex-1">
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-mono uppercase tracking-wider text-blue-600 font-bold">
-                      {proj.client}
-                    </span>
-                    <span className="text-xs font-mono text-slate-400 font-medium">
-                      Verified Case Study
+        {/* Studio-Grade Showcase Grid (3 Columns on Large Screens) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7 mb-20">
+          {filteredProjects.map((proj) => {
+            const displayTags = proj.tagBadges || proj.technologies || proj.tags || [];
+            return (
+              <div
+                key={proj.id}
+                onClick={() => handleOpenDetail(proj)}
+                onMouseEnter={() => soundEffects.playHover()}
+                className="group bg-[#F8FAFC] hover:bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-2xl transition-all duration-300 overflow-hidden cursor-pointer flex flex-col justify-between text-left"
+              >
+                {/* Browser / Device Chrome Header */}
+                <div className="px-4 py-3 bg-slate-900 border-b border-slate-800 flex items-center justify-between text-[10px] font-mono text-slate-400">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
+                    <span className="ml-2 text-slate-300 font-semibold truncate max-w-[150px]">
+                      {proj.title}
                     </span>
                   </div>
 
-                  <h3 className="text-2xl font-display font-extrabold text-slate-950 group-hover:text-blue-600 transition-colors mb-2">
-                    {proj.title}
-                  </h3>
-
-                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed line-clamp-2 mb-6">
-                    {proj.description}
-                  </p>
+                  <div className="flex items-center gap-1">
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/10 text-cyan-300 font-mono">
+                      {proj.duration}
+                    </span>
+                  </div>
                 </div>
 
-                <div>
-                  {/* Tech Stack Badges */}
-                  <div className="flex flex-wrap gap-1.5 mb-6 pt-4 border-t border-slate-100">
-                    {proj.tags.map((tag, idx) => (
-                      <span
-                        key={idx}
-                        className="text-[11px] font-mono px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200"
-                      >
-                        {tag}
+                {/* Realistic Software Screenshot with Interactive Hover Reveal */}
+                <div className="relative aspect-[16/10] overflow-hidden bg-slate-950 group">
+                  <img 
+                    src={proj.image} 
+                    alt={proj.title} 
+                    className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700" 
+                  />
+
+                  {/* Ambient Dark Gradient Sheen */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent opacity-50 group-hover:opacity-30 transition-opacity" />
+
+                  {/* Floating Outcome Metric Pill */}
+                  <div className="absolute bottom-3 left-3 z-10">
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-950/90 backdrop-blur-md border border-emerald-500/40 text-emerald-400 text-[11px] font-mono font-bold shadow-lg">
+                      <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                      <span>{proj.metrics}</span>
+                    </div>
+                  </div>
+
+                  {/* Quick View Button on Hover */}
+                  <div className="absolute bottom-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <div className="px-3 py-1 rounded-xl bg-blue-600 text-white text-[11px] font-display font-bold shadow-lg flex items-center gap-1.5">
+                      <Eye className="w-3 h-3" />
+                      <span>Explore</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Card Details Body */}
+                <div className="p-6 flex flex-col justify-between flex-1">
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-[11px] font-mono uppercase tracking-wider text-blue-600 font-bold truncate">
+                        {proj.client}
                       </span>
-                    ))}
-                  </div>
-
-                  {/* Interactive Action Link */}
-                  <div className="flex items-center justify-between pt-2">
-                    <div className="flex items-center gap-2 text-xs font-display font-bold text-slate-950 group-hover:text-blue-600 transition-colors">
-                      <span>View Live Case Study & Architecture</span>
-                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
                     </div>
 
-                    <div className="w-8 h-8 rounded-full bg-slate-100 group-hover:bg-blue-600 group-hover:text-white flex items-center justify-center text-slate-700 transition-colors">
-                      <ExternalLink className="w-3.5 h-3.5" />
+                    <h3 className="text-xl font-display font-bold text-slate-950 group-hover:text-blue-600 transition-colors mb-2">
+                      {proj.title}
+                    </h3>
+
+                    <p className="text-xs text-slate-600 leading-relaxed line-clamp-2 mb-4">
+                      {proj.description}
+                    </p>
+                  </div>
+
+                  <div>
+                    {/* Tech Stack Badges */}
+                    <div className="flex flex-wrap gap-1 mb-4 pt-3 border-t border-slate-100">
+                      {displayTags.slice(0, 3).map((tag, idx) => (
+                        <span
+                          key={idx}
+                          className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+
+                    {/* Interactive Action Link */}
+                    <div className="flex items-center justify-between pt-2">
+                      <div className="flex items-center gap-1.5 text-xs font-display font-bold text-slate-950 group-hover:text-blue-600 transition-colors">
+                        <span>Case Study Details</span>
+                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                      </div>
+
+                      <div className="w-7 h-7 rounded-full bg-slate-100 group-hover:bg-blue-600 group-hover:text-white flex items-center justify-center text-slate-700 transition-colors">
+                        <ExternalLink className="w-3 h-3" />
+                      </div>
                     </div>
                   </div>
+
                 </div>
-
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Bottom CTA Banner with 3D Chrome Orb from Design */}
@@ -254,6 +250,7 @@ export default function PortfolioSection({ onOpenIntake }) {
         isOpen={!!selectedProject}
         onClose={handleCloseDetail}
         onOpenIntake={onOpenIntake}
+        onSelectProject={setSelectedProject}
       />
 
     </section>
