@@ -1,28 +1,28 @@
 import React from 'react';
-import { ShieldCheck, Zap, Lightbulb, Heart, ArrowRight } from 'lucide-react';
+import { ShieldCheck, Zap, Lightbulb, Heart, ArrowRight, Sparkles, Users } from 'lucide-react';
 import { soundEffects } from '../../utils/soundFx';
 
-export default function AboutSection({ onOpenIntake }) {
+export default function AboutSection({ onOpenIntake, onOpenAboutUs }) {
   const values = [
     {
       icon: Lightbulb,
       title: "Innovation",
-      description: "We stay ahead of the curve, exploring new technologies.",
+      description: "We stay ahead of the curve, exploring WebGPU, generative AI, and spatial computing.",
     },
     {
       icon: ShieldCheck,
       title: "Quality",
-      description: "Every line of code and pixel of design is crafted with precision.",
+      description: "Every line of code and pixel of design is crafted with precision, types, and automated tests.",
     },
     {
       icon: Zap,
       title: "Transparency",
-      description: "No surprises. Clear timelines, clear pricing, and regular updates.",
+      description: "No surprises. Clear timelines, fixed upfront pricing, and real-time sprint visibility.",
     },
     {
       icon: Heart,
       title: "Community",
-      description: "We believe in empowering learners and supporting the builder community.",
+      description: "We believe in empowering learners with capstone grants and supporting open-source builders.",
     },
   ];
 
@@ -87,37 +87,65 @@ export default function AboutSection({ onOpenIntake }) {
           </div>
         </div>
 
-        {/* Our Story Grid from Design */}
+        {/* Our Story Grid with Dedicated Learn More About Us Trigger */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center bg-white rounded-3xl p-8 sm:p-12 border border-slate-200/90 shadow-sm mb-16 text-left">
           
           <div className="lg:col-span-7 space-y-4">
+            <div className="flex items-center gap-2 text-blue-600 text-xs font-mono font-bold uppercase">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Dedicated Studio Experience</span>
+            </div>
             <h3 className="text-2xl font-display font-extrabold text-slate-950">
-              Our Story
+              Our Story & Mission
             </h3>
             <p className="text-sm text-slate-600 leading-relaxed">
-              Aether Studios started with a simple idea: make high-quality digital solutions accessible to everyone. What began as a small team of passionate developers and designers has grown into a full-service studio, helping clients turn their ideas into real, working products.
+              Aether Studios started with a simple idea: make high-quality digital solutions accessible to everyone. What began as a small team of passionate developers and researchers in Cairo has grown into an international studio, shipping websites, apps, and academic capstones with speed and precision.
             </p>
-            <div className="pt-2">
+            <div className="pt-2 flex flex-wrap items-center gap-4">
               <button
                 onClick={() => {
                   soundEffects.playClick();
-                  onOpenIntake();
+                  onOpenAboutUs ? onOpenAboutUs() : onOpenIntake();
                 }}
                 onMouseEnter={() => soundEffects.playHover()}
-                className="inline-flex items-center gap-2 text-xs font-display font-bold text-slate-900 hover:text-blue-600 transition-colors"
+                className="px-5 py-2.5 rounded-full bg-slate-950 hover:bg-blue-600 text-white text-xs font-display font-bold flex items-center gap-2 shadow-sm transition-all"
               >
-                <span>Our Mission</span>
+                <span>Learn More About Us</span>
                 <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+
+              <button
+                onClick={() => {
+                  soundEffects.playClick();
+                  onOpenAboutUs ? onOpenAboutUs() : onOpenIntake();
+                }}
+                onMouseEnter={() => soundEffects.playHover()}
+                className="inline-flex items-center gap-2 text-xs font-display font-bold text-slate-600 hover:text-slate-950 transition-colors py-2"
+              >
+                <Users className="w-3.5 h-3.5 text-blue-600" />
+                <span>Meet the Team & Philosophy</span>
               </button>
             </div>
           </div>
 
-          <div className="lg:col-span-5 rounded-2xl overflow-hidden shadow-md max-h-64">
+          <div 
+            onClick={() => {
+              soundEffects.playClick();
+              if (onOpenAboutUs) onOpenAboutUs();
+            }}
+            className="lg:col-span-5 rounded-2xl overflow-hidden shadow-md max-h-64 cursor-pointer group relative border border-slate-200"
+          >
             <img 
               src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80" 
               alt="Aether Studios Team Workspace" 
-              className="w-full h-full object-cover" 
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
             />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+              <span className="text-xs font-mono text-white flex items-center gap-1.5 font-bold">
+                <span>View Full Studio Dossier & Milestones</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </span>
+            </div>
           </div>
 
         </div>

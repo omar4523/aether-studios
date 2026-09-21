@@ -230,27 +230,6 @@ export default function ContactSection({ onNavigate }) {
 
         </div>
 
-        {/* Footer Bar from Design */}
-        <div className="pt-10 border-t border-slate-200 flex flex-col md:flex-row items-center justify-between gap-6">
-          <div onClick={() => onNavigate('home')}>
-            <AetherLogo textClassName="text-base text-slate-900" />
-          </div>
-
-          <nav className="flex flex-wrap items-center gap-6 text-xs text-slate-500 font-medium">
-            <button onClick={() => onNavigate('home')} className="hover:text-slate-900">Home</button>
-            <button onClick={() => onNavigate('services')} className="hover:text-slate-900">Services</button>
-            <button onClick={() => onNavigate('portfolio')} className="hover:text-slate-900">Portfolio</button>
-            <button onClick={() => onNavigate('about')} className="hover:text-slate-900">About</button>
-            <button onClick={() => onNavigate('pricing')} className="hover:text-slate-900">Pricing</button>
-            <button onClick={() => onNavigate('resources')} className="hover:text-slate-900">Resources</button>
-            <button onClick={() => onNavigate('contact')} className="hover:text-slate-900">Contact</button>
-          </nav>
-
-          <p className="text-[11px] font-mono text-slate-400">
-            © 2026 Aether Studios. All rights reserved.
-          </p>
-        </div>
-
       </div>
     </section>
   );

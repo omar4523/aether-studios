@@ -12,7 +12,14 @@ import AboutSection from './components/sections/AboutSection';
 import PricingSection from './components/sections/PricingSection';
 import BlogSection from './components/sections/BlogSection';
 import ContactSection from './components/sections/ContactSection';
+import Footer from './components/sections/Footer';
 import IntakeModal from './components/sections/IntakeModal';
+import AboutUsModal from './components/sections/AboutUsModal';
+import AuthModal from './components/ui/AuthModal';
+import ClientPortalModal from './components/ui/ClientPortalModal';
+import LegalModal from './components/ui/LegalModal';
+import DocumentationModal from './components/ui/DocumentationModal';
+import { soundEffects } from './utils/soundFx';
 
 export default function App() {
   const [currentTheme, setCurrentTheme] = useState('cyan');
@@ -20,6 +27,25 @@ export default function App() {
   const [isThemeModalOpen, setIsThemeModalOpen] = useState(false);
   const [isIntakeOpen, setIsIntakeOpen] = useState(false);
   const [intakeInitialData, setIntakeInitialData] = useState(null);
+
+  // Dedicated Modals State
+  const [isAboutModalOpen, setIsAboutModalOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authModalMode, setAuthModalMode] = useState('signin');
+  const [isPortalModalOpen, setIsPortalModalOpen] = useState(false);
+  const [isLegalModalOpen, setIsLegalModalOpen] = useState(false);
+  const [legalInitialTab, setLegalInitialTab] = useState('privacy');
+  const [isDocsModalOpen, setIsDocsModalOpen] = useState(false);
+
+  // Persistent User Auth State
+  const [currentUser, setCurrentUser] = useState(() => {
+    try {
+      const saved = localStorage.getItem('aether_user');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
 
   useEffect(() => {
     document.body.setAttribute('data-theme', currentTheme);
@@ -38,23 +64,48 @@ export default function App() {
     setIsIntakeOpen(true);
   };
 
+  const handleLoginSuccess = (user) => {
+    setCurrentUser(user);
+    try {
+      localStorage.setItem('aether_user', JSON.stringify(user));
+    } catch {}
+  };
+
+  const handleLogout = () => {
+    soundEffects.playClick();
+    setCurrentUser(null);
+    try {
+      localStorage.removeItem('aether_user');
+    } catch {}
+  };
+
+  const handleOpenAuth = (mode = 'signin') => {
+    setAuthModalMode(mode);
+    setIsAuthModalOpen(true);
+  };
+
+  const handleOpenLegal = (tab = 'privacy') => {
+    setLegalInitialTab(tab);
+    setIsLegalModalOpen(true);
+  };
+
   return (
     <div className="min-h-screen bg-[#04060A] text-slate-100 flex flex-col antialiased selection:bg-cyan-500/20 selection:text-cyan-300">
       
       {/* Precision Magnetic Mouse Cursor */}
       <CustomCursor />
 
-      {/* Floating Side Quick Dock from Design (Right Side) */}
+      {/* Floating Side Quick Dock (Right Side) */}
       <FloatingSideDock
         currentTheme={currentTheme}
         onThemeChange={setCurrentTheme}
         onOpenThemeModal={() => setIsThemeModalOpen(true)}
       />
 
-      {/* Dedicated Floating Sound Toggle Widget from Design (Bottom-Right) */}
+      {/* Dedicated Floating Sound Toggle Widget (Bottom-Right) */}
       <SoundWidget />
 
-      {/* Theme Switcher Modal from Design */}
+      {/* Theme Switcher Modal */}
       <ThemeModal
         isOpen={isThemeModalOpen}
         onClose={() => setIsThemeModalOpen(false)}
@@ -62,14 +113,18 @@ export default function App() {
         onThemeChange={setCurrentTheme}
       />
 
-      {/* Top Navigation Bar from Design */}
+      {/* Top Navigation Bar with Dynamic Auth & Profile Controls */}
       <Navbar
         onOpenIntake={() => handleOpenIntake()}
         activeSection={activeSection}
         onNavigate={handleNavigate}
+        currentUser={currentUser}
+        onOpenAuth={handleOpenAuth}
+        onLogout={handleLogout}
+        onOpenClientPortal={() => setIsPortalModalOpen(true)}
       />
 
-      {/* Page Sections matching Design Flow */}
+      {/* Page Sections */}
       <main className="flex-grow">
         
         {/* 1. Hero with Glowing A-Monolith & 3D Particles */}
@@ -79,9 +134,15 @@ export default function App() {
           currentTheme={currentTheme}
         />
 
-        {/* 2. Organic White Wave Transition: Solutions for Every Vision (01, 02, 03) */}
+        {/* 2. Solutions for Every Vision (01 Students, 02 Business, 03 Startups) */}
         <WhoWeServeSection
-          onSelectAudience={(audience) => handleNavigate(audience.targetSection || 'services')}
+          onSelectAudience={(audience) => {
+            if (audience.number === '01') {
+              handleOpenIntake({ category: 'student' });
+            } else {
+              handleNavigate('services');
+            }
+          }}
         />
 
         {/* 3. Productized Solutions for Real-World Needs (6 Services) with 3D Crystal */}
@@ -97,6 +158,7 @@ export default function App() {
         {/* 5. About: More Than Just Code. We Build Futures. */}
         <AboutSection
           onOpenIntake={() => handleOpenIntake()}
+          onOpenAboutUs={() => setIsAboutModalOpen(true)}
         />
 
         {/* 6. Simple, Transparent Pricing with 3D Crystal, Monthly/One-time toggle & Instant Calculator */}
@@ -105,11 +167,22 @@ export default function App() {
           onContactClick={() => handleNavigate('contact')}
         />
 
-        {/* 7. Insights & Resources (Blog) */}
+        {/* 7. Insights & Resources with Dedicated Blog Article Reader Modal */}
         <BlogSection />
 
-        {/* 8. Contact & Footer: Let's Build Something Great Together with 3D Purple Crystal */}
+        {/* 8. Contact: Let's Build Something Great Together with 3D Headphones */}
         <ContactSection onNavigate={handleNavigate} />
+
+        {/* 9. Comprehensive Dark Studio Footer with Functional Links & Modals */}
+        <Footer
+          onOpenIntake={() => handleOpenIntake()}
+          onNavigate={handleNavigate}
+          onOpenPortal={() => setIsPortalModalOpen(true)}
+          onOpenLegal={handleOpenLegal}
+          onOpenDocs={() => setIsDocsModalOpen(true)}
+          onOpenAuth={handleOpenAuth}
+          onOpenAboutUs={() => setIsAboutModalOpen(true)}
+        />
 
       </main>
 
@@ -118,6 +191,50 @@ export default function App() {
         isOpen={isIntakeOpen}
         onClose={() => setIsIntakeOpen(false)}
         initialData={intakeInitialData}
+      />
+
+      {/* Comprehensive Dedicated About Us Experience Modal */}
+      <AboutUsModal
+        isOpen={isAboutModalOpen}
+        onClose={() => setIsAboutModalOpen(false)}
+        onOpenIntake={() => handleOpenIntake()}
+      />
+
+      {/* Sign In & Sign Up Auth Modal */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        onLoginSuccess={handleLoginSuccess}
+        initialMode={authModalMode}
+        onOpenTerms={() => {
+          setIsAuthModalOpen(false);
+          handleOpenLegal('terms');
+        }}
+        onOpenPrivacy={() => {
+          setIsAuthModalOpen(false);
+          handleOpenLegal('privacy');
+        }}
+      />
+
+      {/* Live Client Project Portal Tracker Modal */}
+      <ClientPortalModal
+        isOpen={isPortalModalOpen}
+        onClose={() => setIsPortalModalOpen(false)}
+        currentUser={currentUser}
+      />
+
+      {/* Legal Framework Modal: Privacy Policy, Terms of Service, Security Warranty */}
+      <LegalModal
+        isOpen={isLegalModalOpen}
+        onClose={() => setIsLegalModalOpen(false)}
+        initialTab={legalInitialTab}
+      />
+
+      {/* Developer & Capstone Documentation Guidebook Modal */}
+      <DocumentationModal
+        isOpen={isDocsModalOpen}
+        onClose={() => setIsDocsModalOpen(false)}
+        onOpenIntake={() => handleOpenIntake()}
       />
 
     </div>

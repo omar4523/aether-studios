@@ -2,13 +2,25 @@ import React, { useState } from 'react';
 import { ArrowRight, Clock, Calendar, Sparkles } from 'lucide-react';
 import { blogPostsData, blogCategories } from '../../data/pricingData';
 import { soundEffects } from '../../utils/soundFx';
+import ArticleModal from './ArticleModal';
 
 export default function BlogSection() {
   const [activeCategory, setActiveCategory] = useState('all');
+  const [selectedArticle, setSelectedArticle] = useState(null);
 
   const filteredPosts = activeCategory === 'all'
     ? blogPostsData
     : blogPostsData.filter((post) => post.category === activeCategory);
+
+  const handleOpenArticle = (post) => {
+    soundEffects.playClick();
+    setSelectedArticle(post);
+  };
+
+  const handleCloseArticle = () => {
+    soundEffects.playClick();
+    setSelectedArticle(null);
+  };
 
   return (
     <section id="resources" className="relative py-24 bg-[#F8FAFC] text-slate-900 border-t border-slate-200 overflow-hidden">
@@ -18,13 +30,13 @@ export default function BlogSection() {
         <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-6 mb-12">
           <div className="max-w-2xl text-left">
             <div className="text-[11px] font-mono tracking-widest text-slate-500 uppercase font-bold mb-2">
-              — RESOURCES
+              — RESOURCES & INSIGHTS
             </div>
             <h2 className="text-3xl sm:text-5xl font-display font-extrabold text-slate-950 tracking-tight mb-4">
               Latest Insights & Articles
             </h2>
             <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-normal">
-              Tips, tutorials, and updates from the Aether team.
+              Actionable tutorials, architecture breakdowns, and industry updates from our core engineering team.
             </p>
           </div>
 
@@ -64,17 +76,17 @@ export default function BlogSection() {
           })}
         </div>
 
-        {/* 6 Article Cards in 3x2 Grid matching Panel 08 */}
+        {/* 6 Dedicated Article Cards in 3x2 Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 text-left">
           {filteredPosts.map((post) => (
             <article
               key={post.id}
-              onClick={() => soundEffects.playClick()}
+              onClick={() => handleOpenArticle(post)}
               onMouseEnter={() => soundEffects.playHover()}
               className="group bg-white rounded-3xl overflow-hidden border border-slate-200/90 shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col justify-between"
             >
               <div>
-                {/* Article Thumbnail */}
+                {/* Dedicated Unique Article Thumbnail */}
                 <div className="relative aspect-[16/10] overflow-hidden bg-slate-950">
                   <img 
                     src={post.image} 
@@ -114,10 +126,10 @@ export default function BlogSection() {
                 </div>
               </div>
 
-              {/* Read Article Action */}
+              {/* Read Article Action Trigger */}
               <div className="px-6 pb-6 pt-2">
                 <div className="flex items-center gap-1.5 text-xs font-display font-bold text-slate-900 group-hover:text-blue-600 transition-colors pt-3 border-t border-slate-100">
-                  <span>Read Article</span>
+                  <span>Read Full Article</span>
                   <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                 </div>
               </div>
@@ -126,6 +138,15 @@ export default function BlogSection() {
         </div>
 
       </div>
+
+      {/* Full Interactive Article Reader Modal */}
+      <ArticleModal
+        article={selectedArticle}
+        isOpen={!!selectedArticle}
+        onClose={handleCloseArticle}
+        onSelectArticle={(article) => setSelectedArticle(article)}
+      />
+
     </section>
   );
 }

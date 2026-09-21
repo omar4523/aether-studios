@@ -9,11 +9,22 @@ import {
   Mail, 
   ShieldCheck, 
   Heart,
-  Check
+  Check,
+  BookOpen,
+  LogIn,
+  Users
 } from 'lucide-react';
 import { soundEffects } from '../../utils/soundFx';
 
-export default function Footer({ onOpenIntake }) {
+export default function Footer({ 
+  onOpenIntake, 
+  onNavigate, 
+  onOpenPortal, 
+  onOpenLegal, 
+  onOpenDocs, 
+  onOpenAuth, 
+  onOpenAboutUs 
+}) {
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
 
@@ -26,7 +37,7 @@ export default function Footer({ onOpenIntake }) {
   };
 
   return (
-    <footer className="relative border-t border-white/10 bg-[#040508] pt-20 pb-12 overflow-hidden">
+    <footer className="relative border-t border-white/10 bg-[#040508] pt-20 pb-12 overflow-hidden text-left">
       
       {/* Background radial glow */}
       <div 
@@ -51,25 +62,30 @@ export default function Footer({ onOpenIntake }) {
             </p>
           </div>
 
-          <button
-            onClick={() => {
-              soundEffects.playClick();
-              onOpenIntake();
-            }}
-            onMouseEnter={() => soundEffects.playHover()}
-            className="w-full md:w-auto px-8 py-4 rounded-xl font-display font-bold text-sm text-slate-950 bg-gradient-to-r from-[rgb(var(--color-primary))] to-[rgb(var(--color-secondary))] hover:opacity-95 shadow-[0_0_30px_rgba(var(--color-primary),0.35)] flex items-center justify-center gap-2.5 shrink-0 transition-transform active:scale-95"
-          >
-            <span>Start Your Project Brief</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
+          <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+            <button
+              onClick={() => {
+                soundEffects.playClick();
+                onOpenIntake();
+              }}
+              onMouseEnter={() => soundEffects.playHover()}
+              className="w-full sm:w-auto px-8 py-4 rounded-xl font-display font-bold text-sm text-slate-950 bg-gradient-to-r from-[rgb(var(--color-primary))] to-[rgb(var(--color-secondary))] hover:opacity-95 shadow-[0_0_30px_rgba(var(--color-primary),0.35)] flex items-center justify-center gap-2.5 shrink-0 transition-transform active:scale-95"
+            >
+              <span>Start Your Project Brief</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
-        {/* 4 Columns */}
+        {/* 5 Columns */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 mb-16">
           
           {/* Brand Col */}
           <div className="lg:col-span-2 space-y-4">
-            <div className="flex items-center gap-3">
+            <div 
+              className="flex items-center gap-3 cursor-pointer"
+              onClick={() => onNavigate('home')}
+            >
               <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[rgb(var(--color-primary))] to-[rgb(var(--color-secondary))] p-[1px]">
                 <div className="w-full h-full bg-[#07090E] rounded-[11px] flex items-center justify-center">
                   <Terminal className="w-4 h-4 text-[rgb(var(--color-primary))]" />
@@ -81,13 +97,38 @@ export default function Footer({ onOpenIntake }) {
             </div>
 
             <p className="text-xs text-slate-400 leading-relaxed max-w-sm">
-              The next-generation digital studio and project-as-a-service lab. Engineering websites, online stores, web apps, and academic capstones with precision.
+              The next-generation digital studio and project-as-a-service lab. Engineering websites, online stores, web apps, and academic capstones with speed and precision.
             </p>
 
             {/* Live Operational Status */}
             <div className="flex items-center gap-2 text-xs font-mono text-slate-400 pt-2">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>All Systems Operational • Global Engineering Hub</span>
+              <span>All Systems Operational • Cairo HQ & Global Network</span>
+            </div>
+
+            {/* Quick About & Sign In Badges */}
+            <div className="flex items-center gap-2 pt-1">
+              <button
+                onClick={() => {
+                  soundEffects.playClick();
+                  onOpenAboutUs();
+                }}
+                className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-[11px] font-mono text-slate-300 flex items-center gap-1.5 transition-colors"
+              >
+                <Users className="w-3 h-3 text-cyan-400" />
+                <span>Meet the Team</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  soundEffects.playClick();
+                  onOpenAuth('signin');
+                }}
+                className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-[11px] font-mono text-slate-300 flex items-center gap-1.5 transition-colors"
+              >
+                <LogIn className="w-3 h-3 text-purple-400" />
+                <span>Client Sign In</span>
+              </button>
             </div>
           </div>
 
@@ -97,25 +138,97 @@ export default function Footer({ onOpenIntake }) {
               Services
             </h4>
             <ul className="space-y-2 text-xs text-slate-400">
-              <li><a href="#services" className="hover:text-white transition-colors">E-Commerce Stores</a></li>
-              <li><a href="#services" className="hover:text-white transition-colors">SaaS & Web Applications</a></li>
-              <li><a href="#services" className="hover:text-white transition-colors">Mobile iOS & Android</a></li>
-              <li><a href="#student-lab" className="hover:text-white transition-colors">Student Capstone Lab</a></li>
-              <li><a href="#services" className="hover:text-white transition-colors">Three.js 3D & AI Pipelines</a></li>
+              <li>
+                <button 
+                  onClick={() => { soundEffects.playClick(); onNavigate('services'); }} 
+                  className="hover:text-white transition-colors"
+                >
+                  E-Commerce Stores
+                </button>
+              </li>
+              <li>
+                <button 
+                  onClick={() => { soundEffects.playClick(); onNavigate('services'); }} 
+                  className="hover:text-white transition-colors"
+                >
+                  SaaS & Web Applications
+                </button>
+              </li>
+              <li>
+                <button 
+                  onClick={() => { soundEffects.playClick(); onNavigate('services'); }} 
+                  className="hover:text-white transition-colors"
+                >
+                  Mobile iOS & Android
+                </button>
+              </li>
+              <li>
+                <button 
+                  onClick={() => { soundEffects.playClick(); onOpenIntake({ category: 'student' }); }} 
+                  className="hover:text-white transition-colors"
+                >
+                  Student Capstone Lab
+                </button>
+              </li>
+              <li>
+                <button 
+                  onClick={() => { soundEffects.playClick(); onNavigate('services'); }} 
+                  className="hover:text-white transition-colors"
+                >
+                  Three.js 3D & AI Pipelines
+                </button>
+              </li>
             </ul>
           </div>
 
-          {/* Col 3: Resources */}
+          {/* Col 3: Resources & Portals */}
           <div className="space-y-3">
             <h4 className="text-xs font-mono uppercase tracking-wider text-white font-bold">
               Resources
             </h4>
             <ul className="space-y-2 text-xs text-slate-400">
-              <li><a href="#estimator" className="hover:text-white transition-colors">Cost & Timeline Estimator</a></li>
-              <li><a href="#portfolio" className="hover:text-white transition-colors">Case Studies & Showcase</a></li>
-              <li><a href="#portal-preview" className="hover:text-white transition-colors">Client Portal Tracker</a></li>
-              <li><a href="#student-lab" className="hover:text-white transition-colors">Student Grant (STUDENT40)</a></li>
-              <li><a href="#portfolio" className="hover:text-white transition-colors">Code Ownership Guarantee</a></li>
+              <li>
+                <button 
+                  onClick={() => { soundEffects.playClick(); onNavigate('pricing'); }} 
+                  className="hover:text-white transition-colors"
+                >
+                  Cost & Timeline Estimator
+                </button>
+              </li>
+              <li>
+                <button 
+                  onClick={() => { soundEffects.playClick(); onNavigate('portfolio'); }} 
+                  className="hover:text-white transition-colors"
+                >
+                  Case Studies & Showcase
+                </button>
+              </li>
+              <li>
+                <button 
+                  onClick={() => { soundEffects.playClick(); onOpenPortal(); }} 
+                  className="hover:text-cyan-300 font-semibold text-cyan-400 transition-colors flex items-center gap-1"
+                >
+                  <span>Client Portal Tracker</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                </button>
+              </li>
+              <li>
+                <button 
+                  onClick={() => { soundEffects.playClick(); onOpenDocs(); }} 
+                  className="hover:text-white transition-colors flex items-center gap-1.5"
+                >
+                  <BookOpen className="w-3 h-3 text-cyan-400" />
+                  <span>Developer Documentation</span>
+                </button>
+              </li>
+              <li>
+                <button 
+                  onClick={() => { soundEffects.playClick(); onOpenLegal('security'); }} 
+                  className="hover:text-white transition-colors"
+                >
+                  Code Ownership Guarantee
+                </button>
+              </li>
             </ul>
           </div>
 
@@ -155,13 +268,28 @@ export default function Footer({ onOpenIntake }) {
 
         </div>
 
-        {/* Bottom Bar */}
+        {/* Bottom Bar with Functional Interactive Legal Links */}
         <div className="pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-slate-500">
           <p>© 2026 AETHER STUDIOS. All rights reserved.</p>
           <div className="flex items-center gap-6">
-            <span className="hover:text-slate-400 cursor-pointer">Privacy Policy</span>
-            <span className="hover:text-slate-400 cursor-pointer">Terms of Service</span>
-            <span className="hover:text-slate-400 cursor-pointer">Security Warranty</span>
+            <button 
+              onClick={() => { soundEffects.playClick(); onOpenLegal('privacy'); }}
+              className="hover:text-slate-300 transition-colors"
+            >
+              Privacy Policy
+            </button>
+            <button 
+              onClick={() => { soundEffects.playClick(); onOpenLegal('terms'); }}
+              className="hover:text-slate-300 transition-colors"
+            >
+              Terms of Service
+            </button>
+            <button 
+              onClick={() => { soundEffects.playClick(); onOpenLegal('security'); }}
+              className="hover:text-slate-300 transition-colors"
+            >
+              Security Warranty
+            </button>
           </div>
         </div>
 

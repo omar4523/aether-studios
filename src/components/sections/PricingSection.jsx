@@ -90,9 +90,9 @@ export default function PricingSection({ onOpenIntake, onContactClick }) {
           <div className="hidden lg:flex items-center justify-center pr-8 pointer-events-none">
             <div className="relative w-32 h-32 flex items-center justify-center drop-shadow-2xl">
               <img 
-                src="/aether_crystal_blue.jpg" 
-                alt="3D Crystal" 
-                className="w-full h-full object-cover rounded-3xl animate-float-slow shadow-[0_0_35px_rgba(0,242,254,0.3)] border border-white/40" 
+                src="/aether_crystal_purple.jpg" 
+                alt="3D Violet Crystal" 
+                className="w-full h-full object-cover rounded-3xl animate-float-slow shadow-[0_0_35px_rgba(168,85,247,0.35)] border border-white/40" 
               />
             </div>
           </div>
@@ -233,9 +233,9 @@ export default function PricingSection({ onOpenIntake, onContactClick }) {
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
 
-            {/* 3D Orb Graphic from Design */}
-            <div className="hidden sm:block w-16 h-16 rounded-full overflow-hidden shadow-2xl border border-white/40 animate-float-slow shrink-0">
-              <img src="/aether_metallic_orb.jpg" alt="3D Metallic Orb" className="w-full h-full object-cover" />
+            {/* 3D Prism Cube Graphic */}
+            <div className="hidden sm:block w-16 h-16 rounded-2xl overflow-hidden shadow-2xl border border-white/40 animate-float-slow shrink-0">
+              <img src="/aether_prism_cube.jpg" alt="3D Prism Hypercube" className="w-full h-full object-cover" />
             </div>
           </div>
         </div>
