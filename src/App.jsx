@@ -57,10 +57,13 @@ export default function App() {
 
   // Support direct URL routing & browser back/forward buttons
   useEffect(() => {
-    const handleHashChange = () => {
-      const hash = window.location.hash;
-      if (hash === '#auth' || hash === '#signin' || hash === '#signup') {
-        setAuthModalMode(hash === '#signup' ? 'signup' : 'signin');
+    const handleLocationChange = () => {
+      const hash = window.location.hash.toLowerCase();
+      const path = window.location.pathname.toLowerCase();
+      const isAuthPath = path.startsWith('/auth') || path.startsWith('/login') || path.startsWith('/signin') || path.startsWith('/signup');
+
+      if (isAuthPath || hash === '#auth' || hash === '#signin' || hash === '#signup' || hash === '#guest') {
+        setAuthModalMode(hash === '#signup' || path.startsWith('/signup') ? 'signup' : hash === '#guest' ? 'guest' : 'signin');
         setCurrentView('auth');
       } else {
         setCurrentView('main');
@@ -70,9 +73,13 @@ export default function App() {
       }
     };
 
-    handleHashChange();
-    window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
+    handleLocationChange();
+    window.addEventListener('hashchange', handleLocationChange);
+    window.addEventListener('popstate', handleLocationChange);
+    return () => {
+      window.removeEventListener('hashchange', handleLocationChange);
+      window.removeEventListener('popstate', handleLocationChange);
+    };
   }, []);
 
   const handleNavigate = (sectionId) => {
@@ -116,7 +123,7 @@ export default function App() {
       localStorage.removeItem('aether_user');
     } catch {}
     if (window.location.hash === '#portal') {
-      window.location.hash = '#home';
+      window.history.replaceState(null, '', window.location.pathname);
     }
     setIsPortalModalOpen(false);
   };
@@ -125,12 +132,15 @@ export default function App() {
     soundEffects.playClick();
     setAuthModalMode(mode);
     setCurrentView('auth');
-    window.location.hash = mode === 'signup' ? '#signup' : '#auth';
+    window.location.hash = mode === 'signup' ? '#signup' : mode === 'guest' ? '#guest' : '#auth';
   };
 
   const handleBackFromAuth = () => {
     soundEffects.playClick();
     setCurrentView('main');
+    if (window.location.pathname !== '/' && window.location.pathname !== '') {
+      window.history.pushState(null, '', '/');
+    }
     window.location.hash = '#home';
   };
 
@@ -331,7 +341,12 @@ export default function App() {
       {/* Live Client Project Portal Tracker Modal */}
       <ClientPortalModal
         isOpen={isPortalModalOpen}
-        onClose={() => setIsPortalModalOpen(false)}
+        onClose={() => {
+          setIsPortalModalOpen(false);
+          if (window.location.hash === '#portal') {
+            window.history.replaceState(null, '', window.location.pathname);
+          }
+        }}
         currentUser={currentUser}
         initialProjectId={portalProjectId}
         onOpenLegal={handleOpenLegal}

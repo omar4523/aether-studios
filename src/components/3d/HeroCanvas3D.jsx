@@ -81,10 +81,14 @@ export default function HeroCanvas3D({ theme = 'cyan' }) {
     pointLight.position.set(-20, 15, 10);
     scene.add(pointLight);
 
+    // Cached window dimensions to avoid style recalculations on mousemove
+    let winWidth = window.innerWidth || 1920;
+    let winHeight = window.innerHeight || 1080;
+
     // Passive mouse listener
     const handleMouseMove = (e) => {
-      const normX = (e.clientX / window.innerWidth) * 2 - 1;
-      const normY = -(e.clientY / window.innerHeight) * 2 + 1;
+      const normX = (e.clientX / winWidth) * 2 - 1;
+      const normY = -(e.clientY / winHeight) * 2 + 1;
       mouseRef.current.targetX = normX;
       mouseRef.current.targetY = normY;
     };
@@ -93,6 +97,8 @@ export default function HeroCanvas3D({ theme = 'cyan' }) {
 
     const handleResize = () => {
       if (!container) return;
+      winWidth = window.innerWidth || container.clientWidth;
+      winHeight = window.innerHeight || container.clientHeight;
       const newW = container.clientWidth;
       const newH = container.clientHeight;
       camera.aspect = newW / newH;
@@ -145,6 +151,9 @@ export default function HeroCanvas3D({ theme = 'cyan' }) {
       }
     };
 
+    // Start immediately for initial paint
+    startRendering();
+
     // IntersectionObserver to pause rendering when hero is scrolled out of viewport
     let observer = null;
     if ('IntersectionObserver' in window) {
@@ -157,8 +166,6 @@ export default function HeroCanvas3D({ theme = 'cyan' }) {
         }
       }, { threshold: 0.05 });
       observer.observe(container);
-    } else {
-      startRendering();
     }
 
     return () => {

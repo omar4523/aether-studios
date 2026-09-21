@@ -15,13 +15,14 @@ export default function CustomCursor() {
 
     document.body.classList.add('custom-cursor-active');
 
-    let mouseX = -100;
-    let mouseY = -100;
+    let targetX = -100;
+    let targetY = -100;
     let ringX = -100;
     let ringY = -100;
     let isHovered = false;
     let isClicking = false;
     let isVisible = false;
+    let hasMoved = false;
     let animId = null;
 
     const updateHoverState = (hovered) => {
@@ -34,41 +35,41 @@ export default function CustomCursor() {
       }
     };
 
+    // Zero DOM manipulation in mousemove event callback to prevent main-thread stutter
     const handleMouseMove = (e) => {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
+      targetX = e.clientX;
+      targetY = e.clientY;
 
       if (!isVisible) {
         isVisible = true;
+        ringX = targetX;
+        ringY = targetY;
         dot.style.opacity = '1';
         ring.style.opacity = '1';
-        ringX = mouseX;
-        ringY = mouseY;
       }
-
-      // Hardware-accelerated instantaneous dot position (0ms delay)
-      dot.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%) scale(${isClicking ? 0.75 : 1})`;
+      hasMoved = true;
     };
 
     const handleMouseDown = () => {
       isClicking = true;
-      if (isVisible) {
-        dot.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%) scale(0.75)`;
-      }
     };
 
     const handleMouseUp = () => {
       isClicking = false;
-      if (isVisible) {
-        dot.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%) scale(1)`;
-      }
     };
 
     const handleMouseOver = (e) => {
       const target = e.target;
-      if (!target || !target.closest) return;
-      const interactive = target.closest('button, a, input, textarea, select, [role="button"], .cursor-pointer');
-      updateHoverState(!!interactive);
+      if (!target) return;
+      const isInteractive = !!(
+        target.tagName === 'BUTTON' ||
+        target.tagName === 'A' ||
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.tagName === 'SELECT' ||
+        (target.closest && target.closest('button, a, input, textarea, select, [role="button"], .cursor-pointer'))
+      );
+      updateHoverState(isInteractive);
     };
 
     const handleMouseLeave = () => {
@@ -77,14 +78,30 @@ export default function CustomCursor() {
       ring.style.opacity = '0';
     };
 
-    // Smooth fluid follower ring loop
-    const animateFollower = () => {
-      if (isVisible) {
-        ringX += (mouseX - ringX) * 0.32;
-        ringY += (mouseY - ringY) * 0.32;
-        ring.style.transform = `translate3d(${ringX}px, ${ringY}px, 0) translate(-50%, -50%) scale(${isClicking ? 0.88 : 1})`;
+    const handleMouseEnter = () => {
+      isVisible = true;
+      dot.style.opacity = '1';
+      ring.style.opacity = '1';
+    };
+
+    // High-performance RAF animation loop:
+    // 1. Synchronized with display vsync
+    // 2. Hardware-accelerated GPU translate3d + scale (0 layout reflow)
+    // 3. Snappy 0.62 factor eliminating sluggish rubber-band dragging sensation
+    const animateCursor = () => {
+      if (isVisible && hasMoved) {
+        // Instantaneous core dot position (0ms delay)
+        const dotScale = isClicking ? 0.75 : 1;
+        dot.style.transform = `translate3d(${targetX}px, ${targetY}px, 0) translate(-50%, -50%) scale(${dotScale})`;
+
+        // Snappy responsive follower halo
+        ringX += (targetX - ringX) * 0.62;
+        ringY += (targetY - ringY) * 0.62;
+
+        const ringScale = isHovered ? (isClicking ? 1.25 : 1.5) : (isClicking ? 0.8 : 1);
+        ring.style.transform = `translate3d(${ringX}px, ${ringY}px, 0) translate(-50%, -50%) scale(${ringScale})`;
       }
-      animId = requestAnimationFrame(animateFollower);
+      animId = requestAnimationFrame(animateCursor);
     };
 
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
@@ -92,8 +109,9 @@ export default function CustomCursor() {
     window.addEventListener('mouseup', handleMouseUp, { passive: true });
     window.addEventListener('mouseover', handleMouseOver, { passive: true });
     document.addEventListener('mouseleave', handleMouseLeave);
+    document.addEventListener('mouseenter', handleMouseEnter);
 
-    animId = requestAnimationFrame(animateFollower);
+    animId = requestAnimationFrame(animateCursor);
 
     return () => {
       document.body.classList.remove('custom-cursor-active');
@@ -102,6 +120,7 @@ export default function CustomCursor() {
       window.removeEventListener('mouseup', handleMouseUp);
       window.removeEventListener('mouseover', handleMouseOver);
       document.removeEventListener('mouseleave', handleMouseLeave);
+      document.removeEventListener('mouseenter', handleMouseEnter);
       if (animId) cancelAnimationFrame(animId);
     };
   }, []);
@@ -119,19 +138,17 @@ export default function CustomCursor() {
         }}
       />
 
-      {/* Fluid Halo Follower Ring - smooth interpolation without backdrop-blur overhead */}
+      {/* Fluid Halo Follower Ring - 100% GPU-composited scale transform (zero layout reflow) */}
       <div
         ref={ringRef}
         aria-hidden="true"
-        className="fixed top-0 left-0 pointer-events-none z-[9998] rounded-full w-8 h-8 opacity-0 border border-white/40 transition-[width,height,border-color,background-color,opacity] duration-200 ease-out will-change-transform"
+        className="fixed top-0 left-0 pointer-events-none z-[9998] rounded-full w-8 h-8 opacity-0 border border-white/40 transition-[border-color,background-color,box-shadow,opacity] duration-150 ease-out will-change-transform"
       />
 
       <style>{`
         .cursor-hover {
-          width: 48px !important;
-          height: 48px !important;
           border-color: rgb(var(--color-primary)) !important;
-          background-color: rgba(var(--color-primary), 0.12) !important;
+          background-color: rgba(var(--color-primary), 0.15) !important;
           box-shadow: 0 0 16px rgba(var(--color-primary), 0.35) !important;
         }
       `}</style>

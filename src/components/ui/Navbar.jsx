@@ -14,7 +14,8 @@ import {
   Sparkles,
   ExternalLink,
   Calculator,
-  Zap
+  Zap,
+  Compass
 } from 'lucide-react';
 import AetherLogo from './AetherLogo';
 import { soundEffects } from '../../utils/soundFx';
@@ -239,6 +240,19 @@ export default function Navbar({
               <button
                 onClick={() => {
                   soundEffects.playClick();
+                  onOpenAuth('guest');
+                }}
+                onMouseEnter={() => soundEffects.playHover()}
+                className="hidden lg:flex px-3 py-1.5 rounded-full text-xs font-mono font-semibold text-emerald-300 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 transition-all items-center gap-1.5 shadow-sm"
+                title="Explore client portal as guest"
+              >
+                <Compass className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Guest Pass</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  soundEffects.playClick();
                   onOpenAuth('signin');
                 }}
                 onMouseEnter={() => soundEffects.playHover()}
@@ -362,29 +376,43 @@ export default function Navbar({
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-2 gap-2">
+              <div className="space-y-2">
                 <button
                   onClick={() => {
                     soundEffects.playClick();
                     setMobileOpen(false);
-                    onOpenAuth('signin');
+                    onOpenAuth('guest');
                   }}
-                  className="w-full py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-xs font-mono text-white flex items-center justify-center gap-1.5"
+                  className="w-full py-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-xs font-mono font-bold text-emerald-300 flex items-center justify-center gap-2"
                 >
-                  <LogIn className="w-3.5 h-3.5 text-cyan-400" />
-                  <span>Sign In</span>
+                  <Compass className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Explore as Guest Client</span>
                 </button>
-                <button
-                  onClick={() => {
-                    soundEffects.playClick();
-                    setMobileOpen(false);
-                    onOpenAuth('signup');
-                  }}
-                  className="w-full py-2.5 rounded-xl bg-cyan-500/20 border border-cyan-400/30 hover:bg-cyan-500/30 text-xs font-mono font-bold text-cyan-300 flex items-center justify-center gap-1.5"
-                >
-                  <Sparkles className="w-3.5 h-3.5 text-cyan-300" />
-                  <span>Get Started</span>
-                </button>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => {
+                      soundEffects.playClick();
+                      setMobileOpen(false);
+                      onOpenAuth('signin');
+                    }}
+                    className="w-full py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-xs font-mono text-white flex items-center justify-center gap-1.5"
+                  >
+                    <LogIn className="w-3.5 h-3.5 text-cyan-400" />
+                    <span>Sign In</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      soundEffects.playClick();
+                      setMobileOpen(false);
+                      onOpenAuth('signup');
+                    }}
+                    className="w-full py-2.5 rounded-xl bg-cyan-500/20 border border-cyan-400/30 hover:bg-cyan-500/30 text-xs font-mono font-bold text-cyan-300 flex items-center justify-center gap-1.5"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-cyan-300" />
+                    <span>Get Started</span>
+                  </button>
+                </div>
               </div>
             )}
 

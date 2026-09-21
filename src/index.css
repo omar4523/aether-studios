@@ -67,12 +67,13 @@ body[data-theme="gold"] {
   -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 85%);
 }
 
-/* Glassmorphism Card Style */
+/* Glassmorphism Card Style - GPU-optimized composite layer */
 .glass-card {
-  background: rgba(13, 17, 27, 0.65);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: rgba(13, 17, 27, 0.72);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.08);
+  transform: translateZ(0);
 }
 
 .glass-card-hover {
@@ -82,7 +83,7 @@ body[data-theme="gold"] {
   background: rgba(18, 24, 38, 0.85);
   border-color: rgba(var(--color-primary), 0.35);
   box-shadow: 0 10px 30px -10px var(--accent-glow);
-  transform: translateY(-4px);
+  transform: translateY(-4px) translateZ(0);
 }
 
 /* Neon Text Gradient */
@@ -115,10 +116,14 @@ body[data-theme="gold"] {
   to { transform: rotate(360deg); }
 }
 
-/* Hide default cursor on desktop when custom cursor is active, while preserving form input carets */
+/* Hide default cursor on desktop when custom cursor is active, without universal * selector */
 @media (hover: hover) and (pointer: fine) {
+  html.custom-cursor-active,
   body.custom-cursor-active,
-  body.custom-cursor-active * {
+  body.custom-cursor-active a,
+  body.custom-cursor-active button,
+  body.custom-cursor-active [role="button"],
+  body.custom-cursor-active .cursor-pointer {
     cursor: none !important;
   }
   body.custom-cursor-active input,

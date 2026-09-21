@@ -35,9 +35,9 @@ export default function PortfolioSection({ onOpenIntake }) {
   return (
     <section id="portfolio" className="relative py-28 bg-[#FFFFFF] text-slate-900 border-t border-slate-200 overflow-hidden">
       
-      {/* Background Decorative Soft Gradients */}
-      <div className="pointer-events-none absolute top-0 right-1/4 w-[500px] h-[500px] rounded-full bg-blue-100/40 blur-3xl" />
-      <div className="pointer-events-none absolute bottom-1/4 left-1/4 w-[400px] h-[400px] rounded-full bg-cyan-100/30 blur-3xl" />
+      {/* Background Decorative Soft Gradients (GPU composited) */}
+      <div className="pointer-events-none absolute top-0 right-1/4 w-[500px] h-[500px] rounded-full bg-blue-100/40 blur-3xl transform-gpu will-change-transform" />
+      <div className="pointer-events-none absolute bottom-1/4 left-1/4 w-[400px] h-[400px] rounded-full bg-cyan-100/30 blur-3xl transform-gpu will-change-transform" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         

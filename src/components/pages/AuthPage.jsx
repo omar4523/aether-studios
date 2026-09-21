@@ -34,7 +34,7 @@ export default function AuthPage({
   onOpenTerms,
   onOpenPrivacy
 }) {
-  const [activeTab, setActiveTab] = useState(initialMode);
+  const [activeTab, setActiveTab] = useState(initialMode === 'signup' ? 'signup' : 'signin');
   const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
@@ -61,7 +61,7 @@ export default function AuthPage({
     window.scrollTo({ top: 0, behavior: 'instant' });
     setErrorMsg('');
     setSuccessMsg('');
-    setActiveTab(initialMode);
+    setActiveTab(initialMode === 'signup' ? 'signup' : 'signin');
   }, [initialMode]);
 
   const toggleSound = () => {
@@ -357,7 +357,11 @@ export default function AuthPage({
               </div>
 
               {/* 1-CLICK GUEST ACCESS BANNER (PROMINENT HIGHLIGHT) */}
-              <div className="p-4 mx-6 mt-5 rounded-2xl bg-gradient-to-r from-cyan-950/60 via-blue-950/40 to-purple-950/60 border border-cyan-400/40 shadow-[0_0_20px_rgba(0,242,254,0.15)] relative overflow-hidden group">
+              <div className={`p-4 mx-6 mt-5 rounded-2xl bg-gradient-to-r from-cyan-950/70 via-blue-950/50 to-purple-950/70 border ${
+                initialMode === 'guest' 
+                  ? 'border-cyan-300 ring-2 ring-cyan-400/40 shadow-[0_0_30px_rgba(0,242,254,0.3)]' 
+                  : 'border-cyan-400/40 shadow-[0_0_20px_rgba(0,242,254,0.15)]'
+              } relative overflow-hidden group transition-all duration-300`}>
                 <div className="flex items-start justify-between gap-3">
                   <div className="space-y-1">
                     <div className="flex items-center gap-1.5">
@@ -367,6 +371,11 @@ export default function AuthPage({
                       <span className="text-xs font-display font-bold text-white">
                         Explore as Guest Client
                       </span>
+                      {initialMode === 'guest' && (
+                        <span className="px-1.5 py-0.5 rounded text-[9px] font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 animate-pulse font-bold">
+                          VIP PASS
+                        </span>
+                      )}
                     </div>
                     <p className="text-[11px] text-slate-300 leading-tight">
                       Instant 1-click access to the live Project Portal, Kanban sprint tracker & cost estimator without creating an account.

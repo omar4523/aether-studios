@@ -160,10 +160,14 @@ export default function AuthCanvas3D({ theme = 'cyan' }) {
     rimLight.position.set(-12, -8, -10);
     scene.add(rimLight);
 
+    // Cached window dimensions to avoid style recalculations on mousemove
+    let winWidth = window.innerWidth || 1920;
+    let winHeight = window.innerHeight || 1080;
+
     // Interactive mouse listener
     const handleMouseMove = (e) => {
-      const normX = (e.clientX / window.innerWidth) * 2 - 1;
-      const normY = -(e.clientY / window.innerHeight) * 2 + 1;
+      const normX = (e.clientX / winWidth) * 2 - 1;
+      const normY = -(e.clientY / winHeight) * 2 + 1;
       mouseRef.current.targetX = normX;
       mouseRef.current.targetY = normY;
     };
@@ -172,6 +176,8 @@ export default function AuthCanvas3D({ theme = 'cyan' }) {
 
     const handleResize = () => {
       if (!container) return;
+      winWidth = window.innerWidth || container.clientWidth;
+      winHeight = window.innerHeight || container.clientHeight;
       const newW = container.clientWidth;
       const newH = container.clientHeight;
       camera.aspect = newW / newH;
@@ -233,19 +239,35 @@ export default function AuthCanvas3D({ theme = 'cyan' }) {
       renderer.render(scene, camera);
     };
 
+    const startRendering = () => {
+      if (!animId) {
+        clock.start();
+        animId = requestAnimationFrame(animate);
+      }
+    };
+
+    const stopRendering = () => {
+      if (animId) {
+        cancelAnimationFrame(animId);
+        animId = null;
+      }
+    };
+
+    // Start immediately for initial render
+    startRendering();
+
     let observer = null;
     if ('IntersectionObserver' in window) {
       observer = new IntersectionObserver(([entry]) => {
         isIntersecting = entry.isIntersecting;
-        if (isIntersecting && !animId) {
-          clock.start();
-          animate();
+        if (isIntersecting) {
+          startRendering();
+        } else {
+          stopRendering();
         }
       }, { threshold: 0.05 });
       observer.observe(container);
     }
-
-    animate();
 
     return () => {
       if (animId) cancelAnimationFrame(animId);
