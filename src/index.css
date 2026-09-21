@@ -1,0 +1,124 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-primary: 0, 242, 254;      /* Neon Cyan */
+  --color-secondary: 79, 172, 254;   /* Electric Blue */
+  --color-accent: 138, 35, 135;      /* Deep Purple */
+  --accent-glow: rgba(0, 242, 254, 0.4);
+}
+
+/* Custom Theme Palettes */
+body[data-theme="cyan"] {
+  --color-primary: 0, 242, 254;
+  --color-secondary: 79, 172, 254;
+  --color-accent: 138, 35, 135;
+  --accent-glow: rgba(0, 242, 254, 0.4);
+}
+
+body[data-theme="violet"] {
+  --color-primary: 168, 85, 247;
+  --color-secondary: 217, 70, 239;
+  --color-accent: 99, 102, 241;
+  --accent-glow: rgba(168, 85, 247, 0.4);
+}
+
+body[data-theme="emerald"] {
+  --color-primary: 16, 185, 129;
+  --color-secondary: 52, 211, 153;
+  --color-accent: 14, 165, 233;
+  --accent-glow: rgba(16, 185, 129, 0.4);
+}
+
+body[data-theme="gold"] {
+  --color-primary: 245, 158, 11;
+  --color-secondary: 251, 191, 36;
+  --color-accent: 239, 68, 68;
+  --accent-glow: rgba(245, 158, 11, 0.4);
+}
+
+/* Custom Smooth Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #07090E;
+}
+::-webkit-scrollbar-thumb {
+  background: #1e2436;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--color-primary), 0.6);
+}
+
+/* Subtle Animated Background Grid */
+.cyber-grid {
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+}
+
+/* Radial Gradient Masks */
+.radial-vignette {
+  mask-image: radial-gradient(circle at center, black 40%, transparent 85%);
+  -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 85%);
+}
+
+/* Glassmorphism Card Style */
+.glass-card {
+  background: rgba(13, 17, 27, 0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-card-hover {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.glass-card-hover:hover {
+  background: rgba(18, 24, 38, 0.85);
+  border-color: rgba(var(--color-primary), 0.35);
+  box-shadow: 0 10px 30px -10px var(--accent-glow);
+  transform: translateY(-4px);
+}
+
+/* Neon Text Gradient */
+.text-gradient-primary {
+  background: linear-gradient(135deg, rgb(var(--color-primary)) 0%, rgb(var(--color-secondary)) 50%, #ffffff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Animated Border Beam */
+.border-beam {
+  position: relative;
+  overflow: hidden;
+}
+.border-beam::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(from 0deg, transparent 0 340deg, rgb(var(--color-primary)) 360deg);
+  animation: rotate-slow 6s linear infinite;
+  z-index: 0;
+  pointer-events: none;
+}
+
+@keyframes rotate-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Hide default cursor on desktop when custom cursor is active */
+@media (hover: hover) and (pointer: fine) {
+  .custom-cursor-active,
+  .custom-cursor-active * {
+    cursor: none !important;
+  }
+}
