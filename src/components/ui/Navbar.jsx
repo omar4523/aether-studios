@@ -130,11 +130,20 @@ export default function Navbar({
                 }}
                 className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-full bg-white/10 hover:bg-white/15 border border-white/15 transition-all text-xs font-mono"
               >
-                <img 
-                  src={currentUser.avatar} 
-                  alt={currentUser.name} 
-                  className="w-6 h-6 rounded-full object-cover border border-cyan-400/50" 
-                />
+                {currentUser.avatar ? (
+                  <img 
+                    src={currentUser.avatar} 
+                    alt={currentUser.name} 
+                    className="w-6 h-6 rounded-full object-cover border border-cyan-400/50" 
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                    }}
+                  />
+                ) : (
+                  <div className="w-6 h-6 rounded-full bg-cyan-500/20 text-cyan-300 font-bold flex items-center justify-center text-[10px]">
+                    {currentUser.name ? currentUser.name[0].toUpperCase() : 'U'}
+                  </div>
+                )}
                 <span className="text-white font-bold max-w-[100px] truncate">
                   {currentUser.name}
                 </span>
@@ -207,17 +216,31 @@ export default function Navbar({
               )}
             </div>
           ) : (
-            <button
-              onClick={() => {
-                soundEffects.playClick();
-                onOpenAuth('signin');
-              }}
-              onMouseEnter={() => soundEffects.playHover()}
-              className="px-3 sm:px-4 py-2 rounded-full text-xs font-mono text-slate-300 hover:text-white hover:bg-white/10 transition-colors flex items-center gap-1.5"
-            >
-              <LogIn className="w-3.5 h-3.5 text-cyan-400" />
-              <span>Sign In</span>
-            </button>
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={() => {
+                  soundEffects.playClick();
+                  onOpenAuth('signin');
+                }}
+                onMouseEnter={() => soundEffects.playHover()}
+                className="px-3 py-2 rounded-full text-xs font-mono text-slate-300 hover:text-white hover:bg-white/10 transition-colors flex items-center gap-1.5"
+              >
+                <LogIn className="w-3.5 h-3.5 text-cyan-400" />
+                <span>Sign In</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  soundEffects.playClick();
+                  onOpenAuth('signup');
+                }}
+                onMouseEnter={() => soundEffects.playHover()}
+                className="hidden sm:flex px-3.5 py-2 rounded-full text-xs font-mono font-semibold text-cyan-300 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-400/30 transition-all items-center gap-1 shadow-sm"
+              >
+                <Sparkles className="w-3 h-3 text-cyan-400" />
+                <span>Get Started</span>
+              </button>
+            </div>
           )}
 
           {/* Start a Project Pill CTA */}
@@ -308,17 +331,30 @@ export default function Navbar({
                 </button>
               </div>
             ) : (
-              <button
-                onClick={() => {
-                  soundEffects.playClick();
-                  setMobileOpen(false);
-                  onOpenAuth('signin');
-                }}
-                className="w-full py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-xs font-mono text-white flex items-center justify-center gap-2"
-              >
-                <LogIn className="w-4 h-4 text-cyan-400" />
-                <span>Sign In / Register</span>
-              </button>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => {
+                    soundEffects.playClick();
+                    setMobileOpen(false);
+                    onOpenAuth('signin');
+                  }}
+                  className="w-full py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-xs font-mono text-white flex items-center justify-center gap-1.5"
+                >
+                  <LogIn className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>Sign In</span>
+                </button>
+                <button
+                  onClick={() => {
+                    soundEffects.playClick();
+                    setMobileOpen(false);
+                    onOpenAuth('signup');
+                  }}
+                  className="w-full py-2.5 rounded-xl bg-cyan-500/20 border border-cyan-400/30 hover:bg-cyan-500/30 text-xs font-mono font-bold text-cyan-300 flex items-center justify-center gap-1.5"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-cyan-300" />
+                  <span>Get Started</span>
+                </button>
+              </div>
             )}
 
             <button

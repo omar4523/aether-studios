@@ -107,7 +107,7 @@ export default function Footer({
             </div>
 
             {/* Quick About & Sign In Badges */}
-            <div className="flex items-center gap-2 pt-1">
+            <div className="flex flex-wrap items-center gap-2 pt-1">
               <button
                 onClick={() => {
                   soundEffects.playClick();
@@ -126,8 +126,19 @@ export default function Footer({
                 }}
                 className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-[11px] font-mono text-slate-300 flex items-center gap-1.5 transition-colors"
               >
-                <LogIn className="w-3 h-3 text-purple-400" />
-                <span>Client Sign In</span>
+                <LogIn className="w-3.5 h-3.5 text-purple-400" />
+                <span>Sign In</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  soundEffects.playClick();
+                  onOpenAuth('signup');
+                }}
+                className="px-3 py-1.5 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-400/30 text-[11px] font-mono font-bold text-cyan-300 flex items-center gap-1.5 transition-colors"
+              >
+                <Sparkles className="w-3 h-3 text-cyan-400" />
+                <span>Get Started</span>
               </button>
             </div>
           </div>

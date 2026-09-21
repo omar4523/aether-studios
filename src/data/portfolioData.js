@@ -33,7 +33,7 @@ export const portfolioData = [
     category: "ecommerce",
     duration: "Web App • 1 Week",
     image: "/ui_ecommerce_store.jpg",
-    multiDeviceImage: "/ui_ecommerce_store.jpg",
+    multiDeviceImage: "/ui_ecommerce_multi_device.jpg",
     client: "Aether Apparel & Footwear",
     tagBadges: ["E-Commerce", "Shopify", "React", "Tailwind"],
     description: "Modern high-end e-commerce storefront for luxury streetwear with 3D sneakers showcase, dynamic filters, and instant checkout.",

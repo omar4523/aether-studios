@@ -17,17 +17,25 @@ import {
 } from 'lucide-react';
 import { soundEffects } from '../../utils/soundFx';
 
-export default function ClientPortalModal({ isOpen, onClose, currentUser }) {
+export default function ClientPortalModal({ isOpen, onClose, currentUser, initialProjectId, onOpenLegal }) {
   const [activeTab, setActiveTab] = useState('kanban'); // 'kanban' | 'staging' | 'repo'
   const [feedbackSent, setFeedbackSent] = useState(false);
   const [feedbackText, setFeedbackText] = useState('');
-  const [projectIdInput, setProjectIdInput] = useState(currentUser?.projectId || 'AE-8942');
+  const [projectIdInput, setProjectIdInput] = useState(initialProjectId || currentUser?.projectId || 'AE-8942');
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [downloadSuccess, setDownloadSuccess] = useState(false);
+  const [isEditingRef, setIsEditingRef] = useState(false);
+  const [refSearchVal, setRefSearchVal] = useState('');
 
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
       setFeedbackSent(false);
-      if (currentUser?.projectId) {
+      setDownloadSuccess(false);
+      setIsEditingRef(false);
+      if (initialProjectId) {
+        setProjectIdInput(initialProjectId);
+      } else if (currentUser?.projectId) {
         setProjectIdInput(currentUser.projectId);
       }
     } else {
@@ -36,7 +44,7 @@ export default function ClientPortalModal({ isOpen, onClose, currentUser }) {
     return () => {
       document.body.style.overflow = 'unset';
     };
-  }, [isOpen, currentUser]);
+  }, [isOpen, currentUser, initialProjectId]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -97,6 +105,40 @@ export default function ClientPortalModal({ isOpen, onClose, currentUser }) {
     setFeedbackText('');
   };
 
+  const handleDownloadArtifact = () => {
+    soundEffects.playClick();
+    setIsDownloading(true);
+    setTimeout(() => {
+      soundEffects.playSuccess();
+      setIsDownloading(false);
+      setDownloadSuccess(true);
+      const manifestData = `AETHER STUDIOS - PRODUCTION ARTIFACT SPECIFICATION
+Project Ref: #${projectIdInput}
+Generated: ${new Date().toISOString()}
+Integrity SHA-256: 8f4a2b91c0e35d7a9b1c3d5e7f9a1b3c8471e92d
+Client Workspace: ${currentUser?.name || 'Verified Client'}
+Status: Production Staging Passed (Lighthouse 98/100, All Tests Green)
+
+DELIVERABLES LIST:
+1. Source Code Repository (Clean Git history, Next.js 15 / React 19)
+2. Docker Staging Container Specification & Environment Configurations
+3. Commercial Intellectual Property License & Absolute Ownership Deed
+4. Compiled Static Assets & Shaders
+
+Signed: Aether Studios Lead Architect`;
+      const blob = new Blob([manifestData], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `aether-project-${projectIdInput}-manifest.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      setTimeout(() => setDownloadSuccess(false), 4000);
+    }, 700);
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-hidden animate-in fade-in duration-200">
       
@@ -121,10 +163,57 @@ export default function ClientPortalModal({ isOpen, onClose, currentUser }) {
 
             <div className="flex items-center gap-2 text-xs font-mono text-slate-300">
               <Terminal className="w-4 h-4 text-cyan-400" />
-              <span className="font-bold text-white">PROJECT #{projectIdInput}</span>
+              {!isEditingRef ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsEditingRef(true);
+                    setRefSearchVal(projectIdInput);
+                  }}
+                  className="font-bold text-white hover:text-cyan-300 transition-colors flex items-center gap-1.5"
+                  title="Click to lookup another project reference ID"
+                >
+                  <span>PROJECT #{projectIdInput}</span>
+                  <Search className="w-3 h-3 text-slate-400 hover:text-cyan-300" />
+                </button>
+              ) : (
+                <form 
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (refSearchVal.trim()) {
+                      soundEffects.playSuccess();
+                      setProjectIdInput(refSearchVal.trim().toUpperCase());
+                      setIsEditingRef(false);
+                    }
+                  }}
+                  className="flex items-center gap-1.5"
+                >
+                  <input
+                    type="text"
+                    value={refSearchVal}
+                    onChange={(e) => setRefSearchVal(e.target.value)}
+                    placeholder="e.g. AE-8942"
+                    className="bg-black/80 border border-cyan-400/60 rounded px-2 py-0.5 text-xs text-cyan-300 font-mono focus:outline-none w-28"
+                    autoFocus
+                  />
+                  <button
+                    type="submit"
+                    className="text-[10px] px-2 py-0.5 rounded bg-cyan-400 text-slate-950 font-bold"
+                  >
+                    Track
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsEditingRef(false)}
+                    className="text-[10px] text-slate-400 hover:text-white"
+                  >
+                    Cancel
+                  </button>
+                </form>
+              )}
               <span className="text-slate-600">/</span>
-              <span className="text-cyan-300">
-                {currentUser?.name ? `${currentUser.name}'s Workspace` : 'MediVision AI & Lumina Hybrid'}
+              <span className="text-cyan-300 truncate max-w-[180px]">
+                {currentUser?.name ? `${currentUser.name}'s Workspace` : 'Active Sprint Hub'}
               </span>
             </div>
           </div>
@@ -352,29 +441,48 @@ export default function ClientPortalModal({ isOpen, onClose, currentUser }) {
                     </div>
                     <div>
                       <h5 className="text-xs font-bold text-white">Build Artifact (.zip)</h5>
-                      <span className="text-[10px] font-mono text-slate-400">Production ready • 14.2 MB</span>
+                      <span className="text-[10px] font-mono text-slate-400">
+                        {downloadSuccess ? 'Downloaded manifest & bundle!' : 'Production ready • 14.2 MB'}
+                      </span>
                     </div>
                   </div>
                   <button 
-                    onClick={() => soundEffects.playSuccess()}
-                    className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300"
-                    title="Download Archive"
+                    onClick={handleDownloadArtifact}
+                    disabled={isDownloading}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-mono flex items-center gap-1.5 transition-all ${
+                      downloadSuccess 
+                        ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                        : isDownloading 
+                        ? 'bg-purple-500/20 text-purple-300 animate-pulse'
+                        : 'bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white'
+                    }`}
+                    title="Download Archive Bundle"
                   >
-                    <Download className="w-4 h-4" />
+                    <Download className="w-3.5 h-3.5" />
+                    <span>{isDownloading ? 'Bundling...' : downloadSuccess ? 'Saved ✓' : 'Download'}</span>
                   </button>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-between">
+                <div 
+                  onClick={() => {
+                    soundEffects.playClick();
+                    if (onOpenLegal) {
+                      onClose();
+                      onOpenLegal('security');
+                    }
+                  }}
+                  className="p-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-emerald-500/40 transition-all flex items-center justify-between cursor-pointer group"
+                >
                   <div className="flex items-center gap-3">
-                    <div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-400">
+                    <div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 group-hover:scale-105 transition-transform">
                       <ShieldCheck className="w-5 h-5" />
                     </div>
                     <div>
-                      <h5 className="text-xs font-bold text-white">IP Transfer & Warranty</h5>
-                      <span className="text-[10px] font-mono text-slate-400">Full Commercial License</span>
+                      <h5 className="text-xs font-bold text-white group-hover:text-emerald-300 transition-colors">IP Transfer & Warranty</h5>
+                      <span className="text-[10px] font-mono text-slate-400">Full Commercial License • Click to View</span>
                     </div>
                   </div>
-                  <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/30">
+                  <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/30 group-hover:bg-emerald-500/20">
                     Signed ✓
                   </span>
                 </div>

@@ -16,7 +16,7 @@ import {
 import confetti from 'canvas-confetti';
 import { soundEffects } from '../../utils/soundFx';
 
-export default function IntakeModal({ isOpen, onClose, initialData = null }) {
+export default function IntakeModal({ isOpen, onClose, initialData = null, onOpenPortal }) {
   const [step, setStep] = useState(1);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [projectRefId, setProjectRefId] = useState('');
@@ -381,14 +381,19 @@ export default function IntakeModal({ isOpen, onClose, initialData = null }) {
             </div>
 
             <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
-              <a
-                href="#portal-preview"
-                onClick={resetAndClose}
-                className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-mono flex items-center justify-center gap-2"
+              <button
+                type="button"
+                onClick={() => {
+                  soundEffects.playClick();
+                  const targetId = projectRefId;
+                  resetAndClose();
+                  if (onOpenPortal) onOpenPortal(targetId);
+                }}
+                className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-400/40 text-xs font-mono flex items-center justify-center gap-2 transition-colors shadow-sm"
               >
-                <Terminal className="w-3.5 h-3.5 text-[rgb(var(--color-primary))]" />
-                <span>View Live Tracker Simulator</span>
-              </a>
+                <Terminal className="w-3.5 h-3.5 text-cyan-400" />
+                <span>Track #{projectRefId} in Live Portal</span>
+              </button>
               <button
                 onClick={resetAndClose}
                 className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-[rgb(var(--color-primary))] to-[rgb(var(--color-secondary))] text-slate-950 font-bold text-xs"

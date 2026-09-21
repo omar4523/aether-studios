@@ -102,17 +102,33 @@ export default function ProjectDetailModal({ project, isOpen, onClose, onOpenInt
         {/* Multi-Device Showcase Mockup matching Panel 04 */}
         <div className="relative mb-8 rounded-2xl overflow-hidden border border-white/15 shadow-2xl bg-gradient-to-b from-slate-900 via-slate-950 to-black group">
           <div className="px-4 py-2.5 bg-slate-900/90 border-b border-white/10 flex items-center justify-between text-[10px] font-mono text-slate-400">
-            <div className="flex items-center gap-2">
+            <div 
+              onClick={() => {
+                soundEffects.playClick();
+                if (project.liveUrl) window.open(project.liveUrl, '_blank');
+              }}
+              className="flex items-center gap-2 cursor-pointer hover:text-white transition-colors"
+              title="Click to visit live demo"
+            >
               <span className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
               <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80" />
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
-              <span className="ml-2 text-slate-300 font-semibold truncate">
-                https://{project.id}.aetherstudios.dev
+              <span className="ml-2 text-slate-300 hover:text-cyan-300 font-semibold truncate flex items-center gap-1.5">
+                <span>{project.liveUrl || `https://${project.id}.aetherstudios.dev`}</span>
+                <ExternalLink className="w-3 h-3 text-cyan-400" />
               </span>
             </div>
-            <span className="text-cyan-300 bg-white/10 px-2 py-0.5 rounded text-[10px]">
-              Live Case Study View
-            </span>
+
+            <button
+              onClick={() => {
+                soundEffects.playClick();
+                if (project.liveUrl) window.open(project.liveUrl, '_blank');
+              }}
+              className="text-cyan-300 bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-400/40 px-2.5 py-1 rounded-lg text-[10px] font-mono flex items-center gap-1.5 transition-colors"
+            >
+              <span>Launch Live Prototype</span>
+              <ExternalLink className="w-3 h-3" />
+            </button>
           </div>
 
           <div className="relative aspect-[16/9] sm:aspect-[21/9] w-full overflow-hidden">

@@ -115,10 +115,14 @@ body[data-theme="gold"] {
   to { transform: rotate(360deg); }
 }
 
-/* Hide default cursor on desktop when custom cursor is active */
+/* Hide default cursor on desktop when custom cursor is active, but preserve text caret in form inputs */
 @media (hover: hover) and (pointer: fine) {
   .custom-cursor-active,
-  .custom-cursor-active * {
+  .custom-cursor-active *:not(input):not(textarea):not(select) {
     cursor: none !important;
+  }
+  .custom-cursor-active input,
+  .custom-cursor-active textarea {
+    cursor: text !important;
   }
 }

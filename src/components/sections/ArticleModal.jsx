@@ -18,7 +18,7 @@ import {
 import { blogPostsData } from '../../data/pricingData';
 import { soundEffects } from '../../utils/soundFx';
 
-export default function ArticleModal({ article, isOpen, onClose, onSelectArticle }) {
+export default function ArticleModal({ article, isOpen, onClose, onSelectArticle, onOpenIntake }) {
   const [readingProgress, setReadingProgress] = useState(0);
   const [liked, setLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(42);
@@ -378,6 +378,33 @@ export default function ArticleModal({ article, isOpen, onClose, onSelectArticle
               ))}
             </div>
           )}
+
+          {/* Bottom Project Commission Banner */}
+          <div className="p-6 rounded-2xl bg-gradient-to-r from-cyan-950/40 via-purple-950/30 to-black border border-cyan-500/30 flex flex-col sm:flex-row items-center justify-between gap-4 my-6">
+            <div className="space-y-1 text-center sm:text-left">
+              <span className="text-[10px] font-mono uppercase tracking-wider text-cyan-400 font-bold flex items-center justify-center sm:justify-start gap-1.5">
+                <Sparkles className="w-3 h-3" />
+                <span>Ready for Implementation?</span>
+              </span>
+              <h4 className="text-base font-display font-bold text-white">
+                Turn This Architecture into Your Production Reality
+              </h4>
+              <p className="text-xs text-slate-400">
+                Our core engineers build and deploy production-grade software in 48 hours to 2 weeks.
+              </p>
+            </div>
+            <button
+              onClick={() => {
+                soundEffects.playClick();
+                onClose();
+                if (onOpenIntake) onOpenIntake({ description: `Commission inspired by article: ${article.title}` });
+              }}
+              className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-400 to-blue-500 hover:opacity-95 text-slate-950 font-display font-bold text-xs flex items-center justify-center gap-2 shrink-0 shadow-lg active:scale-95"
+            >
+              <span>Commission This Project</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
 
           {/* Related Articles Section */}
           <div className="pt-10 border-t border-white/10 space-y-6">

@@ -33,6 +33,7 @@ export default function App() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authModalMode, setAuthModalMode] = useState('signin');
   const [isPortalModalOpen, setIsPortalModalOpen] = useState(false);
+  const [portalProjectId, setPortalProjectId] = useState(null);
   const [isLegalModalOpen, setIsLegalModalOpen] = useState(false);
   const [legalInitialTab, setLegalInitialTab] = useState('privacy');
   const [isDocsModalOpen, setIsDocsModalOpen] = useState(false);
@@ -89,6 +90,13 @@ export default function App() {
     setIsLegalModalOpen(true);
   };
 
+  const handleOpenPortal = (projectId = null) => {
+    if (projectId) {
+      setPortalProjectId(projectId);
+    }
+    setIsPortalModalOpen(true);
+  };
+
   return (
     <div className="min-h-screen bg-[#04060A] text-slate-100 flex flex-col antialiased selection:bg-cyan-500/20 selection:text-cyan-300">
       
@@ -121,7 +129,7 @@ export default function App() {
         currentUser={currentUser}
         onOpenAuth={handleOpenAuth}
         onLogout={handleLogout}
-        onOpenClientPortal={() => setIsPortalModalOpen(true)}
+        onOpenClientPortal={() => handleOpenPortal()}
       />
 
       {/* Page Sections */}
@@ -168,7 +176,7 @@ export default function App() {
         />
 
         {/* 7. Insights & Resources with Dedicated Blog Article Reader Modal */}
-        <BlogSection />
+        <BlogSection onOpenIntake={(data) => handleOpenIntake(data)} />
 
         {/* 8. Contact: Let's Build Something Great Together with 3D Headphones */}
         <ContactSection onNavigate={handleNavigate} />
@@ -177,7 +185,7 @@ export default function App() {
         <Footer
           onOpenIntake={() => handleOpenIntake()}
           onNavigate={handleNavigate}
-          onOpenPortal={() => setIsPortalModalOpen(true)}
+          onOpenPortal={() => handleOpenPortal()}
           onOpenLegal={handleOpenLegal}
           onOpenDocs={() => setIsDocsModalOpen(true)}
           onOpenAuth={handleOpenAuth}
@@ -191,6 +199,7 @@ export default function App() {
         isOpen={isIntakeOpen}
         onClose={() => setIsIntakeOpen(false)}
         initialData={intakeInitialData}
+        onOpenPortal={handleOpenPortal}
       />
 
       {/* Comprehensive Dedicated About Us Experience Modal */}
@@ -221,6 +230,8 @@ export default function App() {
         isOpen={isPortalModalOpen}
         onClose={() => setIsPortalModalOpen(false)}
         currentUser={currentUser}
+        initialProjectId={portalProjectId}
+        onOpenLegal={handleOpenLegal}
       />
 
       {/* Legal Framework Modal: Privacy Policy, Terms of Service, Security Warranty */}

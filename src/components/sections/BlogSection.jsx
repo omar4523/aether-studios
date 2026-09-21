@@ -4,7 +4,7 @@ import { blogPostsData, blogCategories } from '../../data/pricingData';
 import { soundEffects } from '../../utils/soundFx';
 import ArticleModal from './ArticleModal';
 
-export default function BlogSection() {
+export default function BlogSection({ onOpenIntake }) {
   const [activeCategory, setActiveCategory] = useState('all');
   const [selectedArticle, setSelectedArticle] = useState(null);
 
@@ -145,6 +145,7 @@ export default function BlogSection() {
         isOpen={!!selectedArticle}
         onClose={handleCloseArticle}
         onSelectArticle={(article) => setSelectedArticle(article)}
+        onOpenIntake={onOpenIntake}
       />
 
     </section>
