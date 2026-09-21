@@ -115,14 +115,16 @@ body[data-theme="gold"] {
   to { transform: rotate(360deg); }
 }
 
-/* Hide default cursor on desktop when custom cursor is active, but preserve text caret in form inputs */
+/* Hide default cursor on desktop when custom cursor is active, while preserving form input carets */
 @media (hover: hover) and (pointer: fine) {
-  .custom-cursor-active,
-  .custom-cursor-active *:not(input):not(textarea):not(select) {
+  body.custom-cursor-active,
+  body.custom-cursor-active * {
     cursor: none !important;
   }
-  .custom-cursor-active input,
-  .custom-cursor-active textarea {
+  body.custom-cursor-active input,
+  body.custom-cursor-active textarea,
+  body.custom-cursor-active select,
+  body.custom-cursor-active [contenteditable="true"] {
     cursor: text !important;
   }
 }

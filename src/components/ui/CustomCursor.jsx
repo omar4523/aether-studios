@@ -1,60 +1,97 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 export default function CustomCursor() {
-  const [pos, setPos] = useState({ x: -100, y: -100 });
-  const [followerPos, setFollowerPos] = useState({ x: -100, y: -100 });
-  const [isHovered, setIsHovered] = useState(false);
-  const [isClicking, setIsClicking] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
+  const dotRef = useRef(null);
+  const ringRef = useRef(null);
 
   useEffect(() => {
     // Only enable on desktop pointer devices
     const isTouch = window.matchMedia('(pointer: coarse)').matches;
     if (isTouch) return;
 
-    setIsVisible(true);
+    const dot = dotRef.current;
+    const ring = ringRef.current;
+    if (!dot || !ring) return;
+
     document.body.classList.add('custom-cursor-active');
 
-    const handleMouseMove = (e) => {
-      setPos({ x: e.clientX, y: e.clientY });
-    };
+    let mouseX = -100;
+    let mouseY = -100;
+    let ringX = -100;
+    let ringY = -100;
+    let isHovered = false;
+    let isClicking = false;
+    let isVisible = false;
+    let animId = null;
 
-    const handleMouseDown = () => setIsClicking(true);
-    const handleMouseUp = () => setIsClicking(false);
-
-    // Track hovered interactive elements
-    const handleMouseOver = (e) => {
-      const target = e.target;
-      if (
-        target.tagName === 'BUTTON' ||
-        target.tagName === 'A' ||
-        target.closest('button') ||
-        target.closest('a') ||
-        target.getAttribute('role') === 'button' ||
-        target.classList.contains('cursor-pointer')
-      ) {
-        setIsHovered(true);
+    const updateHoverState = (hovered) => {
+      if (isHovered === hovered) return;
+      isHovered = hovered;
+      if (isHovered) {
+        ring.classList.add('cursor-hover');
       } else {
-        setIsHovered(false);
+        ring.classList.remove('cursor-hover');
       }
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mousedown', handleMouseDown);
-    window.addEventListener('mouseup', handleMouseUp);
-    window.addEventListener('mouseover', handleMouseOver);
+    const handleMouseMove = (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
 
-    // Smooth follower animation frame
-    let animId;
-    let currentX = -100;
-    let currentY = -100;
+      if (!isVisible) {
+        isVisible = true;
+        dot.style.opacity = '1';
+        ring.style.opacity = '1';
+        ringX = mouseX;
+        ringY = mouseY;
+      }
 
+      // Hardware-accelerated instantaneous dot position (0ms delay)
+      dot.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%) scale(${isClicking ? 0.75 : 1})`;
+    };
+
+    const handleMouseDown = () => {
+      isClicking = true;
+      if (isVisible) {
+        dot.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%) scale(0.75)`;
+      }
+    };
+
+    const handleMouseUp = () => {
+      isClicking = false;
+      if (isVisible) {
+        dot.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%) scale(1)`;
+      }
+    };
+
+    const handleMouseOver = (e) => {
+      const target = e.target;
+      if (!target || !target.closest) return;
+      const interactive = target.closest('button, a, input, textarea, select, [role="button"], .cursor-pointer');
+      updateHoverState(!!interactive);
+    };
+
+    const handleMouseLeave = () => {
+      isVisible = false;
+      dot.style.opacity = '0';
+      ring.style.opacity = '0';
+    };
+
+    // Smooth fluid follower ring loop
     const animateFollower = () => {
-      currentX += (pos.x - currentX) * 0.22;
-      currentY += (pos.y - currentY) * 0.22;
-      setFollowerPos({ x: currentX, y: currentY });
+      if (isVisible) {
+        ringX += (mouseX - ringX) * 0.32;
+        ringY += (mouseY - ringY) * 0.32;
+        ring.style.transform = `translate3d(${ringX}px, ${ringY}px, 0) translate(-50%, -50%) scale(${isClicking ? 0.88 : 1})`;
+      }
       animId = requestAnimationFrame(animateFollower);
     };
+
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    window.addEventListener('mousedown', handleMouseDown, { passive: true });
+    window.addEventListener('mouseup', handleMouseUp, { passive: true });
+    window.addEventListener('mouseover', handleMouseOver, { passive: true });
+    document.addEventListener('mouseleave', handleMouseLeave);
 
     animId = requestAnimationFrame(animateFollower);
 
@@ -64,40 +101,40 @@ export default function CustomCursor() {
       window.removeEventListener('mousedown', handleMouseDown);
       window.removeEventListener('mouseup', handleMouseUp);
       window.removeEventListener('mouseover', handleMouseOver);
-      cancelAnimationFrame(animId);
+      document.removeEventListener('mouseleave', handleMouseLeave);
+      if (animId) cancelAnimationFrame(animId);
     };
-  }, [pos.x, pos.y]);
-
-  if (!isVisible) return null;
+  }, []);
 
   return (
     <>
-      {/* Precision Core Dot */}
+      {/* Precision Core Dot - zero lag, instantaneous */}
       <div
-        className="fixed pointer-events-none z-[9999] -translate-x-1/2 -translate-y-1/2 rounded-full transition-transform duration-75 ease-out"
+        ref={dotRef}
+        aria-hidden="true"
+        className="fixed top-0 left-0 pointer-events-none z-[9999] rounded-full w-2 h-2 opacity-0 transition-opacity duration-150 will-change-transform"
         style={{
-          left: `${pos.x}px`,
-          top: `${pos.y}px`,
-          width: isClicking ? '6px' : '8px',
-          height: isClicking ? '6px' : '8px',
           backgroundColor: 'rgb(var(--color-primary))',
           boxShadow: '0 0 10px rgb(var(--color-primary))',
         }}
       />
 
-      {/* Trailing Fluid Halo Ring */}
+      {/* Fluid Halo Follower Ring - smooth interpolation without backdrop-blur overhead */}
       <div
-        className="fixed pointer-events-none z-[9998] -translate-x-1/2 -translate-y-1/2 rounded-full border transition-all duration-300 ease-out"
-        style={{
-          left: `${followerPos.x}px`,
-          top: `${followerPos.y}px`,
-          width: isHovered ? '48px' : isClicking ? '24px' : '32px',
-          height: isHovered ? '48px' : isClicking ? '24px' : '32px',
-          borderColor: isHovered ? 'rgb(var(--color-primary))' : 'rgba(255, 255, 255, 0.35)',
-          backgroundColor: isHovered ? 'rgba(var(--color-primary), 0.12)' : 'transparent',
-          backdropFilter: isHovered ? 'blur(1px)' : 'none',
-        }}
+        ref={ringRef}
+        aria-hidden="true"
+        className="fixed top-0 left-0 pointer-events-none z-[9998] rounded-full w-8 h-8 opacity-0 border border-white/40 transition-[width,height,border-color,background-color,opacity] duration-200 ease-out will-change-transform"
       />
+
+      <style>{`
+        .cursor-hover {
+          width: 48px !important;
+          height: 48px !important;
+          border-color: rgb(var(--color-primary)) !important;
+          background-color: rgba(var(--color-primary), 0.12) !important;
+          box-shadow: 0 0 16px rgba(var(--color-primary), 0.35) !important;
+        }
+      `}</style>
     </>
   );
 }

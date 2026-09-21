@@ -9,13 +9,13 @@ export default function HeroSection({ onOpenIntake, onExploreWork, currentTheme 
       {/* 3D Cosmic Starfield Background */}
       <HeroCanvas3D theme={currentTheme} />
 
-      {/* Atmospheric Nebula Glows */}
+      {/* Atmospheric Nebula Glows (GPU composited) */}
       <div 
-        className="pointer-events-none absolute top-1/4 left-1/3 -translate-x-1/2 w-[650px] h-[550px] rounded-full blur-[160px] opacity-25"
+        className="pointer-events-none absolute top-1/4 left-1/3 -translate-x-1/2 w-[550px] h-[450px] rounded-full blur-[80px] opacity-25 transform-gpu will-change-transform"
         style={{ background: 'rgb(var(--color-primary))' }}
       />
       <div 
-        className="pointer-events-none absolute top-1/2 right-1/4 w-[500px] h-[500px] rounded-full blur-[150px] opacity-20"
+        className="pointer-events-none absolute top-1/2 right-1/4 w-[420px] h-[420px] rounded-full blur-[80px] opacity-20 transform-gpu will-change-transform"
         style={{ background: 'rgb(var(--color-accent))' }}
       />
 

@@ -12,7 +12,9 @@ import {
   Terminal, 
   ShieldCheck, 
   Sparkles,
-  ExternalLink
+  ExternalLink,
+  Calculator,
+  Zap
 } from 'lucide-react';
 import AetherLogo from './AetherLogo';
 import { soundEffects } from '../../utils/soundFx';
@@ -147,6 +149,11 @@ export default function Navbar({
                 <span className="text-white font-bold max-w-[100px] truncate">
                   {currentUser.name}
                 </span>
+                {currentUser.isGuest && (
+                  <span className="hidden sm:inline-block text-[9px] font-mono font-extrabold px-1.5 py-0.5 rounded bg-cyan-400 text-slate-950">
+                    VIP GUEST
+                  </span>
+                )}
                 <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform ${userDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
 
@@ -164,7 +171,7 @@ export default function Navbar({
                     </div>
                     <div className="mt-1.5 flex items-center gap-1.5 text-[9px] font-mono text-cyan-300">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                      <span>{currentUser.role || 'Active Client'}</span>
+                      <span>{currentUser.role || (currentUser.isGuest ? 'VIP Guest Client' : 'Active Client')}</span>
                     </div>
                   </div>
 
@@ -197,6 +204,18 @@ export default function Navbar({
                     >
                       <Sparkles className="w-3.5 h-3.5 text-purple-400" />
                       <span>New Project Intake</span>
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        soundEffects.playClick();
+                        setUserDropdownOpen(false);
+                        onNavigate('pricing');
+                      }}
+                      className="w-full p-2 rounded-xl hover:bg-white/10 text-xs font-mono text-slate-300 hover:text-white flex items-center gap-2 transition-colors"
+                    >
+                      <Calculator className="w-3.5 h-3.5 text-amber-400" />
+                      <span>Interactive Estimator</span>
                     </button>
 
                     <button
@@ -316,6 +335,18 @@ export default function Navbar({
                 >
                   <Terminal className="w-4 h-4" />
                   <span>Open Client Portal</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    soundEffects.playClick();
+                    setMobileOpen(false);
+                    onNavigate('pricing');
+                  }}
+                  className="w-full py-2.5 rounded-xl bg-white/10 text-xs font-mono text-amber-300 flex items-center justify-center gap-2"
+                >
+                  <Calculator className="w-4 h-4" />
+                  <span>Project Cost Estimator</span>
                 </button>
 
                 <button

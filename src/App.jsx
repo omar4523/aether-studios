@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { LogOut, Terminal, Sparkles, ExternalLink } from 'lucide-react';
 import CustomCursor from './components/ui/CustomCursor';
 import Navbar from './components/ui/Navbar';
 import FloatingSideDock from './components/ui/FloatingSideDock';
@@ -16,6 +17,7 @@ import Footer from './components/sections/Footer';
 import IntakeModal from './components/sections/IntakeModal';
 import AboutUsModal from './components/sections/AboutUsModal';
 import AuthModal from './components/ui/AuthModal';
+import AuthPage from './components/pages/AuthPage';
 import ClientPortalModal from './components/ui/ClientPortalModal';
 import LegalModal from './components/ui/LegalModal';
 import DocumentationModal from './components/ui/DocumentationModal';
@@ -24,6 +26,7 @@ import { soundEffects } from './utils/soundFx';
 export default function App() {
   const [currentTheme, setCurrentTheme] = useState('cyan');
   const [activeSection, setActiveSection] = useState('home');
+  const [currentView, setCurrentView] = useState('main'); // 'main' | 'auth'
   const [isThemeModalOpen, setIsThemeModalOpen] = useState(false);
   const [isIntakeOpen, setIsIntakeOpen] = useState(false);
   const [intakeInitialData, setIntakeInitialData] = useState(null);
@@ -52,12 +55,38 @@ export default function App() {
     document.body.setAttribute('data-theme', currentTheme);
   }, [currentTheme]);
 
+  // Support direct URL routing & browser back/forward buttons
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash;
+      if (hash === '#auth' || hash === '#signin' || hash === '#signup') {
+        setAuthModalMode(hash === '#signup' ? 'signup' : 'signin');
+        setCurrentView('auth');
+      } else {
+        setCurrentView('main');
+        if (hash === '#portal') {
+          setIsPortalModalOpen(true);
+        }
+      }
+    };
+
+    handleHashChange();
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
   const handleNavigate = (sectionId) => {
-    setActiveSection(sectionId);
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+    if (currentView !== 'main') {
+      setCurrentView('main');
+      window.location.hash = `#${sectionId}`;
     }
+    setActiveSection(sectionId);
+    setTimeout(() => {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 50);
   };
 
   const handleOpenIntake = (data = null) => {
@@ -70,6 +99,14 @@ export default function App() {
     try {
       localStorage.setItem('aether_user', JSON.stringify(user));
     } catch {}
+
+    // Return to main view and immediately launch the live project portal
+    setCurrentView('main');
+    window.location.hash = '#portal';
+    if (user.projectId) {
+      setPortalProjectId(user.projectId);
+    }
+    setIsPortalModalOpen(true);
   };
 
   const handleLogout = () => {
@@ -78,11 +115,23 @@ export default function App() {
     try {
       localStorage.removeItem('aether_user');
     } catch {}
+    if (window.location.hash === '#portal') {
+      window.location.hash = '#home';
+    }
+    setIsPortalModalOpen(false);
   };
 
   const handleOpenAuth = (mode = 'signin') => {
+    soundEffects.playClick();
     setAuthModalMode(mode);
-    setIsAuthModalOpen(true);
+    setCurrentView('auth');
+    window.location.hash = mode === 'signup' ? '#signup' : '#auth';
+  };
+
+  const handleBackFromAuth = () => {
+    soundEffects.playClick();
+    setCurrentView('main');
+    window.location.hash = '#home';
   };
 
   const handleOpenLegal = (tab = 'privacy') => {
@@ -93,6 +142,8 @@ export default function App() {
   const handleOpenPortal = (projectId = null) => {
     if (projectId) {
       setPortalProjectId(projectId);
+    } else if (currentUser?.projectId) {
+      setPortalProjectId(currentUser.projectId);
     }
     setIsPortalModalOpen(true);
   };
@@ -100,18 +151,56 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#04060A] text-slate-100 flex flex-col antialiased selection:bg-cyan-500/20 selection:text-cyan-300">
       
-      {/* Precision Magnetic Mouse Cursor */}
+      {/* Precision Magnetic Mouse Cursor (0ms latency hardware accelerated) */}
       <CustomCursor />
 
       {/* Floating Side Quick Dock (Right Side) */}
-      <FloatingSideDock
-        currentTheme={currentTheme}
-        onThemeChange={setCurrentTheme}
-        onOpenThemeModal={() => setIsThemeModalOpen(true)}
-      />
+      {currentView === 'main' && (
+        <FloatingSideDock
+          currentTheme={currentTheme}
+          onThemeChange={setCurrentTheme}
+          onOpenThemeModal={() => setIsThemeModalOpen(true)}
+        />
+      )}
 
       {/* Dedicated Floating Sound Toggle Widget (Bottom-Right) */}
-      <SoundWidget />
+      {currentView === 'main' && <SoundWidget />}
+
+      {/* Floating Active VIP Guest Session Indicator (Bottom-Left) */}
+      {currentView === 'main' && currentUser?.isGuest && (
+        <aside 
+          aria-label="VIP Guest Session Notification"
+          className="fixed bottom-5 left-5 z-40 p-3 sm:p-3.5 rounded-2xl bg-[#090D16]/95 border border-cyan-400/40 shadow-2xl backdrop-blur-md flex items-center justify-between gap-3 sm:gap-4 animate-in fade-in slide-in-from-bottom-4 duration-300"
+        >
+          <div className="flex items-center gap-2.5">
+            <div className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping shrink-0" />
+            <div>
+              <div className="text-xs font-display font-bold text-white flex items-center gap-1.5">
+                <span>VIP Guest Preview Active</span>
+              </div>
+              <div className="text-[10px] font-mono text-cyan-300">
+                Project #AE-GUEST-2026 Live
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={() => handleOpenPortal('AE-GUEST-2026')}
+              className="px-3 py-1.5 rounded-lg bg-cyan-400 text-slate-950 font-mono text-xs font-bold hover:bg-cyan-300 transition-colors flex items-center gap-1 shadow-sm"
+            >
+              <Terminal className="w-3.5 h-3.5" />
+              <span>Project Portal</span>
+            </button>
+            <button
+              onClick={handleLogout}
+              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
+              title="Exit Guest Mode"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </aside>
+      )}
 
       {/* Theme Switcher Modal */}
       <ThemeModal
@@ -121,78 +210,92 @@ export default function App() {
         onThemeChange={setCurrentTheme}
       />
 
-      {/* Top Navigation Bar with Dynamic Auth & Profile Controls */}
-      <Navbar
-        onOpenIntake={() => handleOpenIntake()}
-        activeSection={activeSection}
-        onNavigate={handleNavigate}
-        currentUser={currentUser}
-        onOpenAuth={handleOpenAuth}
-        onLogout={handleLogout}
-        onOpenClientPortal={() => handleOpenPortal()}
-      />
-
-      {/* Page Sections */}
-      <main className="flex-grow">
-        
-        {/* 1. Hero with Glowing A-Monolith & 3D Particles */}
-        <HeroSection
-          onOpenIntake={() => handleOpenIntake()}
-          onExploreWork={() => handleNavigate('portfolio')}
+      {/* Standalone Full-Page Auth Experience OR Main Agency Site */}
+      {currentView === 'auth' ? (
+        <AuthPage
+          onLoginSuccess={handleLoginSuccess}
+          onBack={handleBackFromAuth}
+          initialMode={authModalMode}
           currentTheme={currentTheme}
+          onOpenTerms={() => handleOpenLegal('terms')}
+          onOpenPrivacy={() => handleOpenLegal('privacy')}
         />
+      ) : (
+        <>
+          {/* Top Navigation Bar with Dynamic Auth & Profile Controls */}
+          <Navbar
+            onOpenIntake={() => handleOpenIntake()}
+            activeSection={activeSection}
+            onNavigate={handleNavigate}
+            currentUser={currentUser}
+            onOpenAuth={handleOpenAuth}
+            onLogout={handleLogout}
+            onOpenClientPortal={() => handleOpenPortal()}
+          />
 
-        {/* 2. Solutions for Every Vision (01 Students, 02 Business, 03 Startups) */}
-        <WhoWeServeSection
-          onSelectAudience={(audience) => {
-            if (audience.number === '01') {
-              handleOpenIntake({ category: 'student' });
-            } else {
-              handleNavigate('services');
-            }
-          }}
-        />
+          {/* Page Sections */}
+          <main className="flex-grow">
+            
+            {/* 1. Hero with Glowing A-Monolith & 3D Particles */}
+            <HeroSection
+              onOpenIntake={() => handleOpenIntake()}
+              onExploreWork={() => handleNavigate('portfolio')}
+              currentTheme={currentTheme}
+            />
 
-        {/* 3. Productized Solutions for Real-World Needs (6 Services) with 3D Crystal */}
-        <ServicesSection
-          onSelectService={(svc) => handleOpenIntake(svc)}
-        />
+            {/* 2. Solutions for Every Vision (01 Students, 02 Business, 03 Startups) */}
+            <WhoWeServeSection
+              onSelectAudience={(audience) => {
+                if (audience.number === '01') {
+                  handleOpenIntake({ category: 'student' });
+                } else {
+                  handleNavigate('services');
+                }
+              }}
+            />
 
-        {/* 4. Featured Projects Showcase & Bottom CTA Banner with 3D Torus and Orb */}
-        <PortfolioSection
-          onOpenIntake={() => handleOpenIntake()}
-        />
+            {/* 3. Productized Solutions for Real-World Needs (6 Services) with 3D Crystal */}
+            <ServicesSection
+              onSelectService={(svc) => handleOpenIntake(svc)}
+            />
 
-        {/* 5. About: More Than Just Code. We Build Futures. */}
-        <AboutSection
-          onOpenIntake={() => handleOpenIntake()}
-          onOpenAboutUs={() => setIsAboutModalOpen(true)}
-        />
+            {/* 4. Featured Projects Showcase & Bottom CTA Banner with 3D Torus and Orb */}
+            <PortfolioSection
+              onOpenIntake={() => handleOpenIntake()}
+            />
 
-        {/* 6. Simple, Transparent Pricing with 3D Crystal, Monthly/One-time toggle & Instant Calculator */}
-        <PricingSection
-          onOpenIntake={(data) => handleOpenIntake(data)}
-          onContactClick={() => handleNavigate('contact')}
-        />
+            {/* 5. About: More Than Just Code. We Build Futures. */}
+            <AboutSection
+              onOpenIntake={() => handleOpenIntake()}
+              onOpenAboutUs={() => setIsAboutModalOpen(true)}
+            />
 
-        {/* 7. Insights & Resources with Dedicated Blog Article Reader Modal */}
-        <BlogSection onOpenIntake={(data) => handleOpenIntake(data)} />
+            {/* 6. Simple, Transparent Pricing with 3D Crystal, Monthly/One-time toggle & Instant Calculator */}
+            <PricingSection
+              onOpenIntake={(data) => handleOpenIntake(data)}
+              onContactClick={() => handleNavigate('contact')}
+            />
 
-        {/* 8. Contact: Let's Build Something Great Together with 3D Headphones */}
-        <ContactSection onNavigate={handleNavigate} />
+            {/* 7. Insights & Resources with Dedicated Blog Article Reader Modal */}
+            <BlogSection onOpenIntake={(data) => handleOpenIntake(data)} />
 
-        {/* 9. Comprehensive Dark Studio Footer with Functional Links & Modals */}
-        <Footer
-          onOpenIntake={() => handleOpenIntake()}
-          onNavigate={handleNavigate}
-          onOpenPortal={() => handleOpenPortal()}
-          onOpenLegal={handleOpenLegal}
-          onOpenDocs={() => setIsDocsModalOpen(true)}
-          onOpenAuth={handleOpenAuth}
-          onOpenAboutUs={() => setIsAboutModalOpen(true)}
-        />
+            {/* 8. Contact: Let's Build Something Great Together with 3D Headphones */}
+            <ContactSection onNavigate={handleNavigate} />
 
-      </main>
+            {/* 9. Comprehensive Dark Studio Footer with Functional Links & Modals */}
+            <Footer
+              onOpenIntake={() => handleOpenIntake()}
+              onNavigate={handleNavigate}
+              onOpenPortal={() => handleOpenPortal()}
+              onOpenLegal={handleOpenLegal}
+              onOpenDocs={() => setIsDocsModalOpen(true)}
+              onOpenAuth={handleOpenAuth}
+              onOpenAboutUs={() => setIsAboutModalOpen(true)}
+            />
+
+          </main>
+        </>
+      )}
 
       {/* Multi-Step Intake Modal */}
       <IntakeModal
@@ -209,7 +312,7 @@ export default function App() {
         onOpenIntake={() => handleOpenIntake()}
       />
 
-      {/* Sign In & Sign Up Auth Modal */}
+      {/* Backup Modal for Quick In-Place Sign In if needed */}
       <AuthModal
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
@@ -232,6 +335,8 @@ export default function App() {
         currentUser={currentUser}
         initialProjectId={portalProjectId}
         onOpenLegal={handleOpenLegal}
+        onOpenIntake={() => handleOpenIntake()}
+        onOpenEstimator={() => handleNavigate('pricing')}
       />
 
       {/* Legal Framework Modal: Privacy Policy, Terms of Service, Security Warranty */}

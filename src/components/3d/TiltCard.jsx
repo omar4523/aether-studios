@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import { soundEffects } from '../../utils/soundFx';
 
 export default function TiltCard({ 
@@ -9,34 +9,38 @@ export default function TiltCard({
   onClick
 }) {
   const cardRef = useRef(null);
-  const [style, setStyle] = useState({
-    transform: 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)',
-    transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
-  });
-  const [glareStyle, setGlareStyle] = useState({ opacity: 0, x: 50, y: 50 });
+  const glareRef = useRef(null);
+  const rafId = useRef(null);
 
   const handleMouseMove = (e) => {
-    if (!cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
+    const card = cardRef.current;
+    if (!card) return;
+
+    if (rafId.current) {
+      cancelAnimationFrame(rafId.current);
+    }
+
+    const rect = card.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-
     const centerX = rect.width / 2;
     const centerY = rect.height / 2;
 
     const rotateX = ((y - centerY) / centerY) * -maxTilt;
     const rotateY = ((x - centerX) / centerX) * maxTilt;
 
-    setStyle({
-      transform: `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) scale3d(1.02, 1.02, 1.02)`,
-      transition: 'transform 0.08s ease-out'
-    });
+    rafId.current = requestAnimationFrame(() => {
+      if (!cardRef.current) return;
+      cardRef.current.style.transform = `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) scale3d(1.02, 1.02, 1.02)`;
+      cardRef.current.style.transition = 'transform 0.08s ease-out';
 
-    if (glare) {
-      const glareX = (x / rect.width) * 100;
-      const glareY = (y / rect.height) * 100;
-      setGlareStyle({ opacity: 0.18, x: glareX, y: glareY });
-    }
+      if (glare && glareRef.current) {
+        const glareX = (x / rect.width) * 100;
+        const glareY = (y / rect.height) * 100;
+        glareRef.current.style.opacity = '0.18';
+        glareRef.current.style.background = `radial-gradient(circle at ${glareX}% ${glareY}%, rgba(255, 255, 255, 0.7) 0%, transparent 60%)`;
+      }
+    });
   };
 
   const handleMouseEnter = () => {
@@ -44,11 +48,14 @@ export default function TiltCard({
   };
 
   const handleMouseLeave = () => {
-    setStyle({
-      transform: 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)',
-      transition: 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)'
-    });
-    setGlareStyle({ opacity: 0, x: 50, y: 50 });
+    if (rafId.current) cancelAnimationFrame(rafId.current);
+    if (cardRef.current) {
+      cardRef.current.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+      cardRef.current.style.transition = 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
+    }
+    if (glare && glareRef.current) {
+      glareRef.current.style.opacity = '0';
+    }
   };
 
   return (
@@ -58,17 +65,17 @@ export default function TiltCard({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onClick={onClick}
-      style={style}
+      style={{
+        transform: 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)',
+        transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
+      }}
       className={`relative rounded-2xl overflow-hidden will-change-transform ${className}`}
     >
       {children}
       {glare && (
         <div
-          className="pointer-events-none absolute inset-0 z-30 transition-opacity duration-300"
-          style={{
-            opacity: glareStyle.opacity,
-            background: `radial-gradient(circle at ${glareStyle.x}% ${glareStyle.y}%, rgba(255, 255, 255, 0.7) 0%, transparent 60%)`,
-          }}
+          ref={glareRef}
+          className="pointer-events-none absolute inset-0 z-30 transition-opacity duration-300 opacity-0"
         />
       )}
     </div>

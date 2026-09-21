@@ -32,13 +32,14 @@ export default function HeroCanvas3D({ theme = 'cyan' }) {
       powerPreference: 'high-performance',
     });
     renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    // Cap pixel ratio to 1.5 to eliminate GPU fill-rate bottleneck
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     container.appendChild(renderer.domElement);
 
     const colors = themeColors[theme] || themeColors.cyan;
 
-    // 2. Cosmic Starfield Particles (3,000 points spread across depth)
-    const starCount = 3200;
+    // 2. Cosmic Starfield Particles (optimized point count for smooth 120fps)
+    const starCount = 1800;
     const starGeo = new THREE.BufferGeometry();
     const starPositions = new Float32Array(starCount * 3);
     const starColors = new Float32Array(starCount * 3);
@@ -52,7 +53,6 @@ export default function HeroCanvas3D({ theme = 'cyan' }) {
       starPositions[i + 1] = (Math.random() - 0.5) * 110;
       starPositions[i + 2] = (Math.random() - 0.5) * 100 - 10;
 
-      // Color variation
       const rand = Math.random();
       const chosenColor = rand > 0.6 ? color1 : rand > 0.3 ? color2 : colorWhite;
       starColors[i] = chosenColor.r;
@@ -64,7 +64,7 @@ export default function HeroCanvas3D({ theme = 'cyan' }) {
     starGeo.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
 
     const starMat = new THREE.PointsMaterial({
-      size: 0.16,
+      size: 0.18,
       vertexColors: true,
       transparent: true,
       opacity: 0.85,
@@ -73,7 +73,7 @@ export default function HeroCanvas3D({ theme = 'cyan' }) {
     const starSystem = new THREE.Points(starGeo, starMat);
     scene.add(starSystem);
 
-    // 3. Floating Light Orbs in the background
+    // 3. Floating Light Orbs
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
     scene.add(ambientLight);
 
@@ -81,7 +81,7 @@ export default function HeroCanvas3D({ theme = 'cyan' }) {
     pointLight.position.set(-20, 15, 10);
     scene.add(pointLight);
 
-    // Mouse listener
+    // Passive mouse listener
     const handleMouseMove = (e) => {
       const normX = (e.clientX / window.innerWidth) * 2 - 1;
       const normY = -(e.clientY / window.innerHeight) * 2 + 1;
@@ -89,7 +89,7 @@ export default function HeroCanvas3D({ theme = 'cyan' }) {
       mouseRef.current.targetY = normY;
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
 
     const handleResize = () => {
       if (!container) return;
@@ -98,24 +98,29 @@ export default function HeroCanvas3D({ theme = 'cyan' }) {
       camera.aspect = newW / newH;
       camera.updateProjectionMatrix();
       renderer.setSize(newW, newH);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     };
 
-    window.addEventListener('resize', handleResize);
+    window.addEventListener('resize', handleResize, { passive: true });
 
-    // Render loop
-    let animId;
+    // Render loop with IntersectionObserver pause
+    let animId = null;
     let clock = new THREE.Clock();
+    let isIntersecting = true;
 
-    const animate = () => {
-      animId = requestAnimationFrame(animate);
+    const renderFrame = () => {
+      if (!isIntersecting) {
+        animId = null;
+        return;
+      }
+      animId = requestAnimationFrame(renderFrame);
       const elapsed = clock.getElapsedTime();
 
-      // Gentle mouse inertia
+      // Mouse inertia
       mouseRef.current.x += (mouseRef.current.targetX - mouseRef.current.x) * 0.05;
       mouseRef.current.y += (mouseRef.current.targetY - mouseRef.current.y) * 0.05;
 
-      // Slow cosmic drift
+      // Cosmic drift
       starSystem.rotation.y = elapsed * 0.015 + mouseRef.current.x * 0.08;
       starSystem.rotation.x = mouseRef.current.y * 0.05;
 
@@ -126,25 +131,56 @@ export default function HeroCanvas3D({ theme = 'cyan' }) {
       renderer.render(scene, camera);
     };
 
-    animate();
+    const startRendering = () => {
+      if (!animId) {
+        clock.start();
+        animId = requestAnimationFrame(renderFrame);
+      }
+    };
+
+    const stopRendering = () => {
+      if (animId) {
+        cancelAnimationFrame(animId);
+        animId = null;
+      }
+    };
+
+    // IntersectionObserver to pause rendering when hero is scrolled out of viewport
+    let observer = null;
+    if ('IntersectionObserver' in window) {
+      observer = new IntersectionObserver(([entry]) => {
+        isIntersecting = entry.isIntersecting;
+        if (isIntersecting) {
+          startRendering();
+        } else {
+          stopRendering();
+        }
+      }, { threshold: 0.05 });
+      observer.observe(container);
+    } else {
+      startRendering();
+    }
 
     return () => {
-      cancelAnimationFrame(animId);
+      stopRendering();
+      if (observer) observer.disconnect();
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('resize', handleResize);
-      if (container && renderer.domElement) {
+      if (container && renderer.domElement && container.contains(renderer.domElement)) {
         container.removeChild(renderer.domElement);
       }
       renderer.dispose();
       starGeo.dispose();
       starMat.dispose();
+      ambientLight.dispose();
+      pointLight.dispose();
     };
   }, [theme]);
 
   return (
     <div 
       ref={mountRef} 
-      className="absolute inset-0 pointer-events-none z-0 overflow-hidden" 
+      className="absolute inset-0 pointer-events-none z-0 overflow-hidden will-change-transform" 
       aria-hidden="true" 
     />
   );

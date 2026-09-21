@@ -17,7 +17,15 @@ import {
 } from 'lucide-react';
 import { soundEffects } from '../../utils/soundFx';
 
-export default function ClientPortalModal({ isOpen, onClose, currentUser, initialProjectId, onOpenLegal }) {
+export default function ClientPortalModal({ 
+  isOpen, 
+  onClose, 
+  currentUser, 
+  initialProjectId, 
+  onOpenLegal,
+  onOpenIntake,
+  onOpenEstimator
+}) {
   const [activeTab, setActiveTab] = useState('kanban'); // 'kanban' | 'staging' | 'repo'
   const [feedbackSent, setFeedbackSent] = useState(false);
   const [feedbackText, setFeedbackText] = useState('');
@@ -305,6 +313,66 @@ Signed: Aether Studios Lead Architect`;
         {/* Scrollable Tab Content Body */}
         <div className="flex-1 overflow-y-auto p-6 sm:p-8 custom-scrollbar text-left">
           
+          {/* VIP Guest Perks & Features Welcome Banner */}
+          {currentUser?.isGuest && (
+            <div className="mb-6 p-4.5 rounded-2xl bg-gradient-to-r from-cyan-950/70 via-blue-950/50 to-purple-950/70 border border-cyan-400/40 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 animate-in fade-in duration-300">
+              <div className="flex items-start gap-3.5">
+                <div className="p-2.5 rounded-xl bg-cyan-400/20 text-cyan-300 border border-cyan-400/30 shrink-0 mt-0.5">
+                  <Sparkles className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-xs sm:text-sm font-display font-bold text-white">
+                      VIP Guest Workspace Activated
+                    </span>
+                    <span className="text-[9px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold uppercase tracking-wider">
+                      All Features Unlocked
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-300 mt-1 leading-relaxed max-w-2xl">
+                    You are exploring Project <span className="text-cyan-300 font-mono font-semibold">#AE-GUEST-2026</span> (Interactive 3D WebGL Storefront). All sprints, staging sandbox, source code specs, and IP deeds are fully interactive.
+                  </p>
+                  <div className="flex flex-wrap items-center gap-3 mt-2 text-[11px] font-mono text-cyan-300">
+                    <span className="flex items-center gap-1">✓ Live Kanban Tracker</span>
+                    <span className="flex items-center gap-1">✓ Staging Sandbox Preview</span>
+                    <span className="flex items-center gap-1">✓ Instant Deliverable Downloads</span>
+                    <span className="flex items-center gap-1">✓ Project Estimator Integration</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2.5 shrink-0 w-full md:w-auto justify-end pt-2 md:pt-0 border-t md:border-t-0 border-white/10">
+                {onOpenIntake && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      soundEffects.playClick();
+                      onClose();
+                      onOpenIntake();
+                    }}
+                    className="flex-1 md:flex-none px-3.5 py-2 rounded-xl bg-cyan-400 text-slate-950 text-xs font-mono font-bold hover:bg-cyan-300 transition-colors flex items-center justify-center gap-1.5 shadow-md"
+                  >
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>Project Intake</span>
+                  </button>
+                )}
+                {onOpenEstimator && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      soundEffects.playClick();
+                      onClose();
+                      onOpenEstimator();
+                    }}
+                    className="flex-1 md:flex-none px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-mono font-semibold transition-colors flex items-center justify-center gap-1.5"
+                  >
+                    <span>Estimator</span>
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* TAB 1: KANBAN */}
           {activeTab === 'kanban' && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-in fade-in duration-200">

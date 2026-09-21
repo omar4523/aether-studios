@@ -13,7 +13,8 @@ import {
   Briefcase, 
   Rocket, 
   ShieldCheck, 
-  AlertCircle 
+  AlertCircle,
+  Compass
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { soundEffects } from '../../utils/soundFx';
@@ -189,6 +190,33 @@ export default function AuthModal({
     onClose();
   };
 
+  const handleGuestLogin = () => {
+    soundEffects.playSuccess();
+    try {
+      confetti({ particleCount: 70, spread: 60, origin: { y: 0.6 } });
+    } catch {}
+
+    const guestUser = {
+      name: 'Guest Explorer (VIP Pass)',
+      email: 'guest.preview@aetherstudios.dev',
+      role: 'VIP Guest Client',
+      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80',
+      projectId: 'AE-GUEST-2026',
+      accountType: 'guest',
+      isGuest: true,
+      perks: [
+        'Full Interactive Project Portal Access',
+        'Direct Staging Sandbox Sandbox Demo',
+        'Instant Milestone & Deliverables Tracker',
+        'Interactive Cost Estimator with 15% VIP Discount',
+        'Real-time Code & IP Handover Spec Download'
+      ]
+    };
+
+    onLoginSuccess(guestUser);
+    onClose();
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-hidden animate-in fade-in duration-200">
       
@@ -288,6 +316,29 @@ export default function AuthModal({
         {/* Modal Body */}
         <div className="p-6 pt-3 space-y-4 max-h-[75vh] overflow-y-auto custom-scrollbar text-left">
           
+          {/* 1-Click VIP Guest Access Button */}
+          <button
+            type="button"
+            onClick={handleGuestLogin}
+            className="w-full p-3 rounded-2xl bg-gradient-to-r from-cyan-950/60 via-blue-950/50 to-purple-950/60 border border-cyan-400/40 text-left hover:border-cyan-400/70 transition-all flex items-center justify-between group shadow-sm"
+          >
+            <div className="flex items-center gap-2.5">
+              <div className="p-2 rounded-xl bg-cyan-400/20 text-cyan-300">
+                <Compass className="w-4 h-4" />
+              </div>
+              <div>
+                <div className="text-xs font-display font-bold text-white flex items-center gap-1.5">
+                  <span>Continue as Guest Client</span>
+                  <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-cyan-400 text-slate-950 font-bold uppercase">1-Click</span>
+                </div>
+                <div className="text-[10px] text-slate-400">
+                  Instant preview of Project Portal & Estimator
+                </div>
+              </div>
+            </div>
+            <ArrowRight className="w-4 h-4 text-cyan-300 group-hover:translate-x-1 transition-transform" />
+          </button>
+
           {/* 1. SIGN IN FORM */}
           {activeTab === 'signin' && (
             <form onSubmit={handleSignInSubmit} className="space-y-4 animate-in fade-in duration-200">
