@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  ArrowLeft, 
   Mail, 
   Lock, 
   User, 
   Eye, 
   EyeOff, 
-  ArrowRight, 
   BarChart2, 
   MessageSquare, 
   ShieldCheck, 
@@ -15,8 +13,7 @@ import {
   Users, 
   CheckCircle2, 
   AlertCircle,
-  Sparkles,
-  Compass
+  Sparkles
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import AuthCanvas3D from '../3d/AuthCanvas3D';
@@ -75,7 +72,7 @@ export default function AuthPage({
     } catch {}
   };
 
-  // 1-Click Instant VIP Guest Login
+  // 1-Click Instant Guest Login (Fresh empty workspace)
   const handleGuestLogin = () => {
     soundEffects.playSuccess();
     triggerConfetti();
@@ -120,7 +117,8 @@ export default function AuthPage({
       avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
       projectId: 'A-2847',
       projectTitle: 'E-Commerce Website',
-      accountType: 'business'
+      accountType: 'business',
+      isGuest: false
     };
 
     onLoginSuccess(user);
@@ -162,7 +160,8 @@ export default function AuthPage({
       avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80',
       projectId: 'A-2847',
       projectTitle: 'E-Commerce Website',
-      accountType: 'business'
+      accountType: 'business',
+      isGuest: false
     };
 
     onLoginSuccess(newUser);
@@ -181,7 +180,8 @@ export default function AuthPage({
         : 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=150&q=80',
       projectId: 'A-2847',
       projectTitle: 'E-Commerce Website',
-      accountType: 'business'
+      accountType: 'business',
+      isGuest: false
     };
     onLoginSuccess(user);
   };
@@ -189,84 +189,82 @@ export default function AuthPage({
   const isLogin = activeTab === 'signin';
 
   return (
-    <div className="min-h-screen bg-[#03060E] text-slate-100 flex flex-col relative overflow-x-hidden selection:bg-cyan-500/20 selection:text-cyan-300">
+    <div className="min-h-screen bg-[#03060E] text-slate-100 flex flex-col relative overflow-x-hidden selection:bg-cyan-500/20 selection:text-cyan-300 font-sans">
       
-      {/* 3D Stardust & Glass Orbs Canvas */}
+      {/* 3D Dynamic Stardust Canvas */}
       <AuthCanvas3D mode={activeTab} theme={currentTheme} />
 
-      {/* Top Header Bar */}
-      <header className="relative z-30 w-full max-w-7xl mx-auto px-4 sm:px-8 py-5 flex items-center justify-between">
-        <div onClick={onBack} className="cursor-pointer">
+      {/* Top Header with Logo only matching Mockup */}
+      <header className="relative z-30 w-full max-w-7xl mx-auto px-6 sm:px-10 pt-7 pb-2 flex items-center justify-between">
+        <div 
+          onClick={onBack} 
+          className="cursor-pointer"
+          title="Return to Studio Home"
+        >
           <AetherLogo showText={true} />
         </div>
 
+        {/* Clean top return link */}
         <button
-          onClick={() => {
-            soundEffects.playClick();
-            onBack();
-          }}
-          className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-mono text-slate-300 hover:text-white transition-all group active:scale-95 shadow-sm"
+          onClick={onBack}
+          className="text-xs font-mono text-slate-400 hover:text-white transition-colors"
         >
-          <ArrowLeft className="w-3.5 h-3.5 text-cyan-400 group-hover:-translate-x-1 transition-transform" />
-          <span>Return to Home</span>
+          ← Return to Home
         </button>
       </header>
 
-      {/* Main Dual-Stage Content Grid */}
+      {/* Main Dual-Stage Content Grid matching Mockup */}
       <main className="relative z-20 flex-grow flex items-center justify-center py-6 sm:py-10 px-4 sm:px-8">
-        <div className="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center">
+        <div className="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center">
           
-          {/* LEFT STAGE: Branding, 3D Hero Artwork & Feature Bullets */}
-          <div className="lg:col-span-6 relative flex flex-col justify-between text-left min-h-[520px]">
+          {/* ================= LEFT COLUMN matching Mockup ================= */}
+          <div className="lg:col-span-7 relative flex flex-col justify-between text-left min-h-[560px]">
             
-            {/* 3D Background Artwork matching Mockup */}
-            <div className="absolute inset-0 -z-10 rounded-3xl overflow-hidden opacity-90 pointer-events-none">
+            {/* Prominent 3D Background Artwork matching Mockup */}
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-full max-w-[500px] h-[480px] -z-10 overflow-hidden pointer-events-none opacity-95">
               <img 
                 src={isLogin ? '/aether_auth_login_art.jpg' : '/aether_auth_signup_art.jpg'} 
                 alt={isLogin ? '3D Aether Monolith' : '3D Aether Crystal'}
-                className="w-full h-full object-cover object-center scale-105 transition-all duration-700 filter brightness-95"
+                className="w-full h-full object-contain filter drop-shadow-[0_0_40px_rgba(0,242,254,0.35)] scale-105 transition-all duration-700"
               />
-              {/* Radial gradient shading to blend text cleanly */}
-              <div className="absolute inset-0 bg-gradient-to-r from-[#03060E]/95 via-[#03060E]/75 to-transparent" />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#03060E] via-transparent to-transparent" />
             </div>
 
-            {/* Top Text Content */}
-            <div className="space-y-4 pt-4 relative z-10 max-w-md">
+            {/* Top Text Content matching Mockup */}
+            <div className="space-y-4 pt-2 relative z-10 max-w-md">
               
-              {/* Category Pill matching Mockup */}
+              {/* Cyan Tag Pill matching Mockup */}
               <div className="inline-flex items-center gap-1.5 text-xs font-mono font-bold tracking-wider text-cyan-400">
                 <span>→</span>
                 <span>{isLogin ? 'WELCOME BACK' : 'GET STARTED'}</span>
               </div>
 
               {/* Headline matching Mockup */}
-              <h1 className="text-3xl sm:text-5xl font-display font-extrabold text-white leading-[1.12] tracking-tight">
+              <h1 className="text-4xl sm:text-5xl lg:text-[54px] font-display font-black text-white leading-[1.12] tracking-tight">
                 {isLogin ? (
                   <>
                     Great to <br />
-                    see you <span className="text-[#A855F7] drop-shadow-[0_0_25px_rgba(168,85,247,0.4)]">again</span>
+                    see you <span className="text-[#A855F7] drop-shadow-[0_0_30px_rgba(168,85,247,0.5)]">again</span>
                   </>
                 ) : (
                   <>
-                    Create <span className="text-[#A855F7] drop-shadow-[0_0_25px_rgba(168,85,247,0.4)]">Your</span> <br />
-                    <span className="text-[#A855F7] drop-shadow-[0_0_25px_rgba(168,85,247,0.4)]">Account</span>
+                    Create <span className="text-[#A855F7] drop-shadow-[0_0_30px_rgba(168,85,247,0.5)]">Your</span> <br />
+                    <span className="text-[#A855F7] drop-shadow-[0_0_30px_rgba(168,85,247,0.5)]">Account</span>
                   </>
                 )}
               </h1>
 
               {/* Subtitle matching Mockup */}
-              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-normal">
+              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-normal max-w-sm">
                 {isLogin
                   ? 'Log in to continue your journey and bring your ideas to life.'
                   : 'Join Aether Studios and start turning your ideas into reality.'}
               </p>
 
-              {/* 3 Feature Bullets matching Mockup */}
-              <div className="space-y-3 pt-3">
+              {/* 3 Feature Bullets with Icon Pill Boxes matching Mockup */}
+              <div className="space-y-3.5 pt-4">
                 {isLogin ? (
                   <>
-                    {/* Feature 1 */}
+                    {/* Bullet 1 */}
                     <div className="flex items-center gap-3.5 group">
                       <div className="w-10 h-10 rounded-xl bg-white/[0.08] border border-white/10 flex items-center justify-center shrink-0 text-cyan-400 group-hover:scale-105 transition-transform">
                         <BarChart2 className="w-4 h-4" />
@@ -277,7 +275,7 @@ export default function AuthPage({
                       </div>
                     </div>
 
-                    {/* Feature 2 */}
+                    {/* Bullet 2 */}
                     <div className="flex items-center gap-3.5 group">
                       <div className="w-10 h-10 rounded-xl bg-white/[0.08] border border-white/10 flex items-center justify-center shrink-0 text-cyan-400 group-hover:scale-105 transition-transform">
                         <MessageSquare className="w-4 h-4" />
@@ -288,7 +286,7 @@ export default function AuthPage({
                       </div>
                     </div>
 
-                    {/* Feature 3 */}
+                    {/* Bullet 3 */}
                     <div className="flex items-center gap-3.5 group">
                       <div className="w-10 h-10 rounded-xl bg-white/[0.08] border border-white/10 flex items-center justify-center shrink-0 text-cyan-400 group-hover:scale-105 transition-transform">
                         <ShieldCheck className="w-4 h-4" />
@@ -301,7 +299,7 @@ export default function AuthPage({
                   </>
                 ) : (
                   <>
-                    {/* Feature 1 */}
+                    {/* Bullet 1 */}
                     <div className="flex items-center gap-3.5 group">
                       <div className="w-10 h-10 rounded-xl bg-white/[0.08] border border-white/10 flex items-center justify-center shrink-0 text-purple-400 group-hover:scale-105 transition-transform">
                         <Rocket className="w-4 h-4" />
@@ -312,7 +310,7 @@ export default function AuthPage({
                       </div>
                     </div>
 
-                    {/* Feature 2 */}
+                    {/* Bullet 2 */}
                     <div className="flex items-center gap-3.5 group">
                       <div className="w-10 h-10 rounded-xl bg-white/[0.08] border border-white/10 flex items-center justify-center shrink-0 text-purple-400 group-hover:scale-105 transition-transform">
                         <Bell className="w-4 h-4" />
@@ -323,7 +321,7 @@ export default function AuthPage({
                       </div>
                     </div>
 
-                    {/* Feature 3 */}
+                    {/* Bullet 3 */}
                     <div className="flex items-center gap-3.5 group">
                       <div className="w-10 h-10 rounded-xl bg-white/[0.08] border border-white/10 flex items-center justify-center shrink-0 text-purple-400 group-hover:scale-105 transition-transform">
                         <Users className="w-4 h-4" />
@@ -340,7 +338,7 @@ export default function AuthPage({
             </div>
 
             {/* Bottom Left Switch Link matching Mockup */}
-            <div className="pt-6 relative z-10 text-xs text-slate-400">
+            <div className="pt-8 relative z-10 text-xs text-slate-400">
               {isLogin ? (
                 <p>
                   Don't have an account?{' '}
@@ -352,7 +350,7 @@ export default function AuthPage({
                       setSuccessMsg('');
                       setActiveTab('signup');
                     }}
-                    className="text-[#A855F7] hover:text-[#C084FC] font-semibold transition-colors inline-flex items-center gap-1"
+                    className="text-[#A855F7] hover:text-[#C084FC] font-semibold transition-colors inline-flex items-center gap-1 ml-1"
                   >
                     <span>Sign up</span>
                     <span>→</span>
@@ -369,9 +367,9 @@ export default function AuthPage({
                       setSuccessMsg('');
                       setActiveTab('signin');
                     }}
-                    className="text-[#A855F7] hover:text-[#C084FC] font-semibold transition-colors inline-flex items-center gap-1"
+                    className="text-[#A855F7] hover:text-[#C084FC] font-semibold transition-colors inline-flex items-center gap-1 ml-1"
                   >
-                    <span>Log in</span>
+                    <span>Log In</span>
                     <span>→</span>
                   </button>
                 </p>
@@ -380,12 +378,12 @@ export default function AuthPage({
 
           </div>
 
-          {/* RIGHT STAGE: Form Card Console matching Mockup */}
-          <div className="lg:col-span-6 flex justify-center w-full">
-            <div className="w-full max-w-md bg-[#090D18]/90 border border-white/15 rounded-3xl p-6 sm:p-8 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.8)] backdrop-blur-md text-slate-100 flex flex-col relative z-20">
+          {/* ================= RIGHT CARD COLUMN matching Mockup ================= */}
+          <div className="lg:col-span-5 flex justify-center w-full">
+            <div className="w-full max-w-md bg-[#090D18]/95 border border-white/15 rounded-3xl p-7 sm:p-8 shadow-[0_25px_70px_-15px_rgba(0,0,0,0.85)] backdrop-blur-xl text-slate-100 flex flex-col relative z-20">
               
-              {/* Header Title & Subtitle matching Mockup */}
-              <div className="text-left mb-5">
+              {/* Card Header matching Mockup (Clean title and subtitle, NO tab switcher) */}
+              <div className="text-left mb-6">
                 <h2 className="text-2xl font-display font-extrabold text-white">
                   {isLogin ? 'Log In' : 'Sign Up'}
                 </h2>
@@ -411,28 +409,12 @@ export default function AuthPage({
                 </div>
               )}
 
-              {/* 1-CLICK INSTANT VIP GUEST BUTTON (FAST ACCESS) */}
-              <button
-                type="button"
-                onClick={handleGuestLogin}
-                className="mb-4 w-full py-2.5 px-3.5 rounded-xl bg-gradient-to-r from-cyan-950/70 via-slate-900 to-purple-950/70 border border-cyan-400/40 hover:border-cyan-300 text-xs font-mono font-bold text-cyan-300 hover:text-white flex items-center justify-between transition-all group shadow-sm active:scale-[0.99]"
-              >
-                <span className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
-                  <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-                  <span>1-Click Instant Guest Access</span>
-                </span>
-                <span className="text-[10px] bg-cyan-400/20 text-cyan-200 px-2 py-0.5 rounded-full">
-                  Zero Password →
-                </span>
-              </button>
-
-              {/* FORM: LOG IN OR SIGN UP */}
+              {/* FORM: LOG IN OR SIGN UP matching Mockup */}
               {isLogin ? (
                 /* LOG IN FORM matching Top-Left Mockup */
                 <form onSubmit={handleSignInSubmit} className="space-y-4 text-left">
                   
-                  {/* Email address */}
+                  {/* Email address : */}
                   <div>
                     <label className="text-xs font-sans text-slate-300 block mb-1.5 font-medium">
                       Email address :
@@ -444,13 +426,13 @@ export default function AuthPage({
                         placeholder="you@example.com"
                         value={signInData.email}
                         onChange={(e) => setSignInData({ ...signInData, email: e.target.value })}
-                        className="w-full bg-[#0D1220] border border-white/15 rounded-xl px-4 py-2.5 pl-10 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-colors"
+                        className="w-full bg-[#0D1220] border border-white/15 rounded-xl px-4 py-2.5 pl-10 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-[#6366F1] focus:ring-1 focus:ring-[#6366F1] transition-colors"
                       />
                       <Mail className="w-4 h-4 text-slate-500 absolute left-3.5 top-3" />
                     </div>
                   </div>
 
-                  {/* Password */}
+                  {/* Password : */}
                   <div>
                     <label className="text-xs font-sans text-slate-300 block mb-1.5 font-medium">
                       Password :
@@ -462,7 +444,7 @@ export default function AuthPage({
                         placeholder="••••••••••••"
                         value={signInData.password}
                         onChange={(e) => setSignInData({ ...signInData, password: e.target.value })}
-                        className="w-full bg-[#0D1220] border border-white/15 rounded-xl px-4 py-2.5 pl-10 pr-10 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-colors"
+                        className="w-full bg-[#0D1220] border border-white/15 rounded-xl px-4 py-2.5 pl-10 pr-10 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-[#6366F1] focus:ring-1 focus:ring-[#6366F1] transition-colors"
                       />
                       <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-3" />
                       <button
@@ -481,14 +463,14 @@ export default function AuthPage({
                           soundEffects.playSuccess();
                           setSuccessMsg('A password recovery dispatch has been sent to your email.');
                         }}
-                        className="text-[11px] text-cyan-400 hover:text-cyan-300 font-medium transition-colors"
+                        className="text-[11px] text-[#38BDF8] hover:text-[#60A5FA] font-medium transition-colors"
                       >
                         Forgot password?
                       </button>
                     </div>
                   </div>
 
-                  {/* Primary CTA: Log In → matching gradient from mockup */}
+                  {/* Primary CTA Button: Log In → matching Mockup */}
                   <button
                     type="submit"
                     className="w-full py-3 rounded-xl font-display font-bold text-xs text-white bg-gradient-to-r from-[#4F46E5] via-[#6366F1] to-[#A855F7] hover:opacity-95 shadow-[0_0_20px_rgba(99,102,241,0.35)] flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
@@ -504,7 +486,7 @@ export default function AuthPage({
                     <div className="border-t border-white/10 w-full" />
                   </div>
 
-                  {/* Social SSO: Google & GitHub matching Mockup */}
+                  {/* Social Buttons matching Mockup */}
                   <div className="space-y-2.5">
                     <button
                       type="button"
@@ -532,12 +514,24 @@ export default function AuthPage({
                     </button>
                   </div>
 
+                  {/* Clean discreet guest link */}
+                  <div className="pt-2 text-center">
+                    <button
+                      type="button"
+                      onClick={handleGuestLogin}
+                      className="text-[11px] font-mono text-cyan-400 hover:text-cyan-300 transition-colors inline-flex items-center gap-1"
+                    >
+                      <Sparkles className="w-3 h-3" />
+                      <span>Continue as Guest Client (Empty Workspace) →</span>
+                    </button>
+                  </div>
+
                 </form>
               ) : (
                 /* SIGN UP FORM matching Top-Right Mockup */
                 <form onSubmit={handleSignUpSubmit} className="space-y-3.5 text-left">
                   
-                  {/* Full Name */}
+                  {/* Full Name : */}
                   <div>
                     <label className="text-xs font-sans text-slate-300 block mb-1 font-medium">
                       Full Name :
@@ -549,13 +543,13 @@ export default function AuthPage({
                         placeholder="John Doe"
                         value={signUpData.fullName}
                         onChange={(e) => setSignUpData({ ...signUpData, fullName: e.target.value })}
-                        className="w-full bg-[#0D1220] border border-white/15 rounded-xl px-4 py-2 pl-10 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-400 transition-colors"
+                        className="w-full bg-[#0D1220] border border-white/15 rounded-xl px-4 py-2 pl-10 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-[#6366F1] transition-colors"
                       />
                       <User className="w-4 h-4 text-slate-500 absolute left-3.5 top-2.5" />
                     </div>
                   </div>
 
-                  {/* Email address */}
+                  {/* Email address : */}
                   <div>
                     <label className="text-xs font-sans text-slate-300 block mb-1 font-medium">
                       Email address :
@@ -567,13 +561,13 @@ export default function AuthPage({
                         placeholder="you@example.com"
                         value={signUpData.email}
                         onChange={(e) => setSignUpData({ ...signUpData, email: e.target.value })}
-                        className="w-full bg-[#0D1220] border border-white/15 rounded-xl px-4 py-2 pl-10 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-400 transition-colors"
+                        className="w-full bg-[#0D1220] border border-white/15 rounded-xl px-4 py-2 pl-10 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-[#6366F1] transition-colors"
                       />
                       <Mail className="w-4 h-4 text-slate-500 absolute left-3.5 top-2.5" />
                     </div>
                   </div>
 
-                  {/* Password */}
+                  {/* Password : */}
                   <div>
                     <label className="text-xs font-sans text-slate-300 block mb-1 font-medium">
                       Password :
@@ -585,7 +579,7 @@ export default function AuthPage({
                         placeholder="Create a strong password"
                         value={signUpData.password}
                         onChange={(e) => setSignUpData({ ...signUpData, password: e.target.value })}
-                        className="w-full bg-[#0D1220] border border-white/15 rounded-xl px-4 py-2 pl-10 pr-10 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-400 transition-colors"
+                        className="w-full bg-[#0D1220] border border-white/15 rounded-xl px-4 py-2 pl-10 pr-10 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-[#6366F1] transition-colors"
                       />
                       <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-2.5" />
                       <button
@@ -598,7 +592,7 @@ export default function AuthPage({
                     </div>
                   </div>
 
-                  {/* Confirm Password */}
+                  {/* Confirm Password : */}
                   <div>
                     <label className="text-xs font-sans text-slate-300 block mb-1 font-medium">
                       Confirm Password :
@@ -610,7 +604,7 @@ export default function AuthPage({
                         placeholder="Confirm your password"
                         value={signUpData.confirmPassword}
                         onChange={(e) => setSignUpData({ ...signUpData, confirmPassword: e.target.value })}
-                        className="w-full bg-[#0D1220] border border-white/15 rounded-xl px-4 py-2 pl-10 pr-10 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-400 transition-colors"
+                        className="w-full bg-[#0D1220] border border-white/15 rounded-xl px-4 py-2 pl-10 pr-10 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-[#6366F1] transition-colors"
                       />
                       <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-2.5" />
                       <button
@@ -667,7 +661,7 @@ export default function AuthPage({
                     </button>
                   </div>
 
-                  {/* Footnote Terms Agreement */}
+                  {/* Footnote Terms Agreement matching Mockup */}
                   <p className="text-[10px] text-slate-400 pt-1 text-center leading-normal">
                     By creating an account, you agree to our{' '}
                     <button type="button" onClick={onOpenTerms} className="text-[#38BDF8] hover:underline">

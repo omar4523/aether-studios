@@ -18,7 +18,8 @@ import IntakeModal from './components/sections/IntakeModal';
 import AboutUsModal from './components/sections/AboutUsModal';
 import AuthModal from './components/ui/AuthModal';
 import AuthPage from './components/pages/AuthPage';
-import ClientPortalModal from './components/ui/ClientPortalModal';
+import DashboardPage from './components/pages/DashboardPage';
+import ProjectShowcasePage from './components/pages/ProjectShowcasePage';
 import LegalModal from './components/ui/LegalModal';
 import DocumentationModal from './components/ui/DocumentationModal';
 import { soundEffects } from './utils/soundFx';
@@ -26,7 +27,7 @@ import { soundEffects } from './utils/soundFx';
 export default function App() {
   const [currentTheme, setCurrentTheme] = useState('cyan');
   const [activeSection, setActiveSection] = useState('home');
-  const [currentView, setCurrentView] = useState('main'); // 'main' | 'auth'
+  const [currentView, setCurrentView] = useState('main'); // 'main' | 'auth' | 'dashboard' | 'showcase'
   const [isThemeModalOpen, setIsThemeModalOpen] = useState(false);
   const [isIntakeOpen, setIsIntakeOpen] = useState(false);
   const [intakeInitialData, setIntakeInitialData] = useState(null);
@@ -35,8 +36,6 @@ export default function App() {
   const [isAboutModalOpen, setIsAboutModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authModalMode, setAuthModalMode] = useState('signin');
-  const [isPortalModalOpen, setIsPortalModalOpen] = useState(false);
-  const [portalProjectId, setPortalProjectId] = useState(null);
   const [isLegalModalOpen, setIsLegalModalOpen] = useState(false);
   const [legalInitialTab, setLegalInitialTab] = useState('privacy');
   const [isDocsModalOpen, setIsDocsModalOpen] = useState(false);
@@ -65,11 +64,12 @@ export default function App() {
       if (isAuthPath || hash === '#auth' || hash === '#signin' || hash === '#signup' || hash === '#guest') {
         setAuthModalMode(hash === '#signup' || path.startsWith('/signup') ? 'signup' : hash === '#guest' ? 'guest' : 'signin');
         setCurrentView('auth');
+      } else if (hash === '#dashboard' || hash === '#portal' || path.startsWith('/dashboard') || path.startsWith('/portal')) {
+        setCurrentView('dashboard');
+      } else if (hash === '#showcase' || hash === '#travel' || path.startsWith('/showcase') || path.startsWith('/travel')) {
+        setCurrentView('showcase');
       } else {
         setCurrentView('main');
-        if (hash === '#portal') {
-          setIsPortalModalOpen(true);
-        }
       }
     };
 
@@ -83,6 +83,18 @@ export default function App() {
   }, []);
 
   const handleNavigate = (sectionId) => {
+    if (sectionId === 'dashboard' || sectionId === 'portal') {
+      soundEffects.playClick();
+      setCurrentView('dashboard');
+      window.location.hash = '#dashboard';
+      return;
+    }
+    if (sectionId === 'showcase' || sectionId === 'travel') {
+      soundEffects.playClick();
+      setCurrentView('showcase');
+      window.location.hash = '#showcase';
+      return;
+    }
     if (currentView !== 'main') {
       setCurrentView('main');
       window.location.hash = `#${sectionId}`;
@@ -107,13 +119,9 @@ export default function App() {
       localStorage.setItem('aether_user', JSON.stringify(user));
     } catch {}
 
-    // Return to main view and immediately launch the live project portal
-    setCurrentView('main');
-    window.location.hash = '#portal';
-    if (user.projectId) {
-      setPortalProjectId(user.projectId);
-    }
-    setIsPortalModalOpen(true);
+    // Directly navigate to full-page dashboard (NO modal over landing page!)
+    setCurrentView('dashboard');
+    window.location.hash = '#dashboard';
   };
 
   const handleLogout = () => {
@@ -122,10 +130,14 @@ export default function App() {
     try {
       localStorage.removeItem('aether_user');
     } catch {}
-    if (window.location.hash === '#portal') {
-      window.history.replaceState(null, '', window.location.pathname);
-    }
-    setIsPortalModalOpen(false);
+    setCurrentView('main');
+    window.location.hash = '#home';
+  };
+
+  const handleOpenPortal = (projectId = null) => {
+    soundEffects.playClick();
+    setCurrentView('dashboard');
+    window.location.hash = '#dashboard';
   };
 
   const handleOpenAuth = (mode = 'signin') => {
@@ -147,15 +159,6 @@ export default function App() {
   const handleOpenLegal = (tab = 'privacy') => {
     setLegalInitialTab(tab);
     setIsLegalModalOpen(true);
-  };
-
-  const handleOpenPortal = (projectId = null) => {
-    if (projectId) {
-      setPortalProjectId(projectId);
-    } else if (currentUser?.projectId) {
-      setPortalProjectId(currentUser.projectId);
-    }
-    setIsPortalModalOpen(true);
   };
 
   return (
@@ -218,7 +221,7 @@ export default function App() {
         onThemeChange={setCurrentTheme}
       />
 
-      {/* Standalone Full-Page Auth Experience OR Main Agency Site */}
+      {/* Standalone Full Pages OR Main Agency Site */}
       {currentView === 'auth' ? (
         <AuthPage
           onLoginSuccess={handleLoginSuccess}
@@ -227,6 +230,27 @@ export default function App() {
           currentTheme={currentTheme}
           onOpenTerms={() => handleOpenLegal('terms')}
           onOpenPrivacy={() => handleOpenLegal('privacy')}
+        />
+      ) : currentView === 'dashboard' ? (
+        <DashboardPage
+          currentUser={currentUser}
+          onNavigateHome={() => handleNavigate('home')}
+          onOpenShowcase={() => {
+            soundEffects.playClick();
+            setCurrentView('showcase');
+            window.location.hash = '#showcase';
+          }}
+          onLogout={handleLogout}
+          onOpenIntake={handleOpenIntake}
+        />
+      ) : currentView === 'showcase' ? (
+        <ProjectShowcasePage
+          currentUser={currentUser}
+          onBackToDashboard={() => {
+            soundEffects.playClick();
+            setCurrentView('dashboard');
+            window.location.hash = '#dashboard';
+          }}
         />
       ) : (
         <>
@@ -334,22 +358,6 @@ export default function App() {
           setIsAuthModalOpen(false);
           handleOpenLegal('privacy');
         }}
-      />
-
-      {/* Live Client Project Portal Tracker Modal */}
-      <ClientPortalModal
-        isOpen={isPortalModalOpen}
-        onClose={() => {
-          setIsPortalModalOpen(false);
-          if (window.location.hash === '#portal') {
-            window.history.replaceState(null, '', window.location.pathname);
-          }
-        }}
-        currentUser={currentUser}
-        initialProjectId={portalProjectId}
-        onOpenLegal={handleOpenLegal}
-        onOpenIntake={() => handleOpenIntake()}
-        onOpenEstimator={() => handleNavigate('pricing')}
       />
 
       {/* Legal Framework Modal: Privacy Policy, Terms of Service, Security Warranty */}
