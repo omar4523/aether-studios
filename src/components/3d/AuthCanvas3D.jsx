@@ -1,135 +1,179 @@
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 
-export default function AuthCanvas3D({ theme = 'cyan' }) {
+export default function AuthCanvas3D({ theme = 'cyan', offsetLeft = true }) {
   const mountRef = useRef(null);
   const mouseRef = useRef({ x: 0, y: 0, targetX: 0, targetY: 0 });
 
   const themeColors = {
-    cyan: { primary: 0x00f2fe, secondary: 0x4facfe, core: 0x8a2387, ambient: 0x071126 },
-    violet: { primary: 0xa855f7, secondary: 0xd946ef, core: 0x6366f1, ambient: 0x180726 },
-    emerald: { primary: 0x10b981, secondary: 0x34d399, core: 0x0284c7, ambient: 0x061c16 },
-    gold: { primary: 0xf59e0b, secondary: 0xfbbf24, core: 0xef4444, ambient: 0x241403 },
+    cyan: {
+      primary: 0x00f2fe,
+      secondary: 0x38bdf8,
+      accent: 0xa855f7,
+      core: 0x0284c7,
+      glow: 0x00f2fe,
+    },
+    violet: {
+      primary: 0xa855f7,
+      secondary: 0xc084fc,
+      accent: 0xec4899,
+      core: 0x7c3aed,
+      glow: 0xa855f7,
+    },
+    emerald: {
+      primary: 0x10b981,
+      secondary: 0x34d399,
+      accent: 0x06b6d4,
+      core: 0x059669,
+      glow: 0x10b981,
+    },
+    gold: {
+      primary: 0xf59e0b,
+      secondary: 0xfbbf24,
+      accent: 0xf97316,
+      core: 0xd97706,
+      glow: 0xf59e0b,
+    },
   };
 
   useEffect(() => {
     const container = mountRef.current;
     if (!container) return;
 
-    // 1. Scene, Camera, Renderer
+    // 1. Scene, Camera & Renderer
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x04060a, 0.02);
+    scene.fog = new THREE.FogExp2(0x04060a, 0.022);
 
     const width = container.clientWidth || window.innerWidth;
     const height = container.clientHeight || window.innerHeight;
 
-    const camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 1000);
-    camera.position.set(0, 0, 18);
+    const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+    camera.position.set(0, 0, 19);
 
     const renderer = new THREE.WebGLRenderer({
       alpha: true,
-      antialias: true,
+      antialias: false,
       powerPreference: 'high-performance',
     });
     renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.2;
+    renderer.setPixelRatio(1.0); // 1.0 fixed pixel ratio for 120fps fluid interaction
     container.appendChild(renderer.domElement);
 
     const colors = themeColors[theme] || themeColors.cyan;
 
-    // 2. Central 3D Cyber Crystal / Quantum Core
-    const crystalGroup = new THREE.Group();
-    scene.add(crystalGroup);
+    // 2. Quantum Nexus Master Group
+    const masterGroup = new THREE.Group();
+    if (offsetLeft && window.innerWidth >= 1024) {
+      masterGroup.position.x = -4.2;
+    }
+    scene.add(masterGroup);
 
-    // Inner glowing crystal
-    const innerGeo = new THREE.OctahedronGeometry(4.2, 0);
-    const innerMat = new THREE.MeshPhysicalMaterial({
+    // Core 1: Faceted Icosahedron Gem
+    const coreGeo = new THREE.IcosahedronGeometry(3.6, 0);
+    const coreMat = new THREE.MeshStandardMaterial({
       color: colors.primary,
       emissive: colors.core,
-      emissiveIntensity: 0.35,
+      emissiveIntensity: 0.55,
+      roughness: 0.25,
       metalness: 0.85,
-      roughness: 0.15,
       wireframe: false,
       transparent: true,
-      opacity: 0.75,
-      reflectivity: 0.9,
-      clearcoat: 1.0,
-      clearcoatRoughness: 0.1,
+      opacity: 0.9,
     });
-    const innerCrystal = new THREE.Mesh(innerGeo, innerMat);
-    crystalGroup.add(innerCrystal);
+    const coreMesh = new THREE.Mesh(coreGeo, coreMat);
+    masterGroup.add(coreMesh);
 
-    // Outer wireframe cage
-    const wireGeo = new THREE.IcosahedronGeometry(5.6, 1);
-    const wireMat = new THREE.MeshBasicMaterial({
+    // Core 2: Inner Pulsing Energy Octahedron
+    const innerGeo = new THREE.OctahedronGeometry(2.4, 0);
+    const innerMat = new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.75,
+    });
+    const innerMesh = new THREE.Mesh(innerGeo, innerMat);
+    masterGroup.add(innerMesh);
+
+    // Core 3: Outer Tech Wireframe Cage
+    const cageGeo = new THREE.DodecahedronGeometry(5.2, 0);
+    const cageMat = new THREE.MeshBasicMaterial({
       color: colors.secondary,
       wireframe: true,
       transparent: true,
-      opacity: 0.45,
+      opacity: 0.4,
     });
-    const wireCage = new THREE.Mesh(wireGeo, wireMat);
-    crystalGroup.add(wireCage);
+    const cageMesh = new THREE.Mesh(cageGeo, cageMat);
+    masterGroup.add(cageMesh);
 
-    // Dynamic Orbital Gimbal Rings
-    const ringGeo1 = new THREE.TorusGeometry(7.2, 0.04, 16, 100);
+    // Gyroscopic Ring 1 (Horizontal Inclined)
+    const ringGeo1 = new THREE.TorusGeometry(6.6, 0.05, 12, 72);
     const ringMat1 = new THREE.MeshBasicMaterial({
       color: colors.primary,
       transparent: true,
-      opacity: 0.6,
+      opacity: 0.65,
     });
-    const orbitalRing1 = new THREE.Mesh(ringGeo1, ringMat1);
-    orbitalRing1.rotation.x = Math.PI / 3;
-    crystalGroup.add(orbitalRing1);
+    const ringMesh1 = new THREE.Mesh(ringGeo1, ringMat1);
+    ringMesh1.rotation.x = Math.PI / 3.2;
+    masterGroup.add(ringMesh1);
 
-    const ringGeo2 = new THREE.TorusGeometry(8.4, 0.03, 16, 100);
+    // Gyroscopic Ring 2 (Vertical Inclined)
+    const ringGeo2 = new THREE.TorusGeometry(7.8, 0.035, 12, 72);
     const ringMat2 = new THREE.MeshBasicMaterial({
-      color: colors.secondary,
+      color: colors.accent,
       transparent: true,
-      opacity: 0.4,
+      opacity: 0.5,
     });
-    const orbitalRing2 = new THREE.Mesh(ringGeo2, ringMat2);
-    orbitalRing2.rotation.y = Math.PI / 4;
-    crystalGroup.add(orbitalRing2);
+    const ringMesh2 = new THREE.Mesh(ringGeo2, ringMat2);
+    ringMesh2.rotation.y = Math.PI / 3.8;
+    masterGroup.add(ringMesh2);
 
-    // Floating Data Node Satellites
-    const satGroup = new THREE.Group();
-    const satCount = 6;
-    const satGeo = new THREE.OctahedronGeometry(0.35, 0);
+    // Orbiting Quantum Node Satellites (4 nodes with trails)
+    const satelliteGroup = new THREE.Group();
+    const satCount = 4;
+    const satellites = [];
+    const satGeo = new THREE.OctahedronGeometry(0.3, 0);
     const satMat = new THREE.MeshBasicMaterial({
       color: 0xffffff,
       wireframe: true,
     });
-    const satellites = [];
 
     for (let i = 0; i < satCount; i++) {
-      const satMesh = new THREE.Mesh(satGeo, satMat);
+      const sat = new THREE.Mesh(satGeo, satMat);
       const angle = (i / satCount) * Math.PI * 2;
-      const radius = 6.8 + (i % 2) * 1.5;
-      satMesh.position.set(Math.cos(angle) * radius, (Math.random() - 0.5) * 3, Math.sin(angle) * radius);
-      satellites.push({ mesh: satMesh, speed: 0.015 + (i * 0.003), angle, radius });
-      satGroup.add(satMesh);
+      const radius = 6.2 + (i % 2) * 1.6;
+      sat.position.set(Math.cos(angle) * radius, (Math.random() - 0.5) * 2, Math.sin(angle) * radius);
+      satellites.push({
+        mesh: sat,
+        speed: 0.01 + (i * 0.004),
+        angle,
+        radius,
+        elevation: (i - 1.5) * 0.8,
+      });
+      satelliteGroup.add(sat);
     }
-    crystalGroup.add(satGroup);
+    masterGroup.add(satelliteGroup);
 
-    // 3. Cyber Dust & Star Particle Cloud
-    const particleCount = 750;
+    // Accretion Particle Disk / Stardust
+    const particleCount = 360;
     const partGeo = new THREE.BufferGeometry();
     const positions = new Float32Array(particleCount * 3);
     const partColors = new Float32Array(particleCount * 3);
 
-    const c1 = new THREE.Color(colors.primary);
-    const c2 = new THREE.Color(colors.secondary);
+    const cPrimary = new THREE.Color(colors.primary);
+    const cSecondary = new THREE.Color(colors.secondary);
+    const cAccent = new THREE.Color(colors.accent);
     const cWhite = new THREE.Color(0xffffff);
 
     for (let i = 0; i < particleCount * 3; i += 3) {
-      positions[i] = (Math.random() - 0.5) * 60;
-      positions[i + 1] = (Math.random() - 0.5) * 45;
-      positions[i + 2] = (Math.random() - 0.5) * 35;
+      // Dispersed disk & ambient field
+      const theta = Math.random() * Math.PI * 2;
+      const r = 3 + Math.random() * 22;
+      positions[i] = Math.cos(theta) * r + (Math.random() - 0.5) * 8;
+      positions[i + 1] = (Math.random() - 0.5) * 26;
+      positions[i + 2] = Math.sin(theta) * r + (Math.random() - 0.5) * 15;
 
-      const r = Math.random();
-      const col = r > 0.6 ? c1 : r > 0.3 ? c2 : cWhite;
+      const rand = Math.random();
+      const col = rand > 0.65 ? cPrimary : rand > 0.4 ? cSecondary : rand > 0.2 ? cAccent : cWhite;
       partColors[i] = col.r;
       partColors[i + 1] = col.g;
       partColors[i + 2] = col.b;
@@ -139,33 +183,36 @@ export default function AuthCanvas3D({ theme = 'cyan' }) {
     partGeo.setAttribute('color', new THREE.BufferAttribute(partColors, 3));
 
     const partMat = new THREE.PointsMaterial({
-      size: 0.15,
+      size: 0.18,
       vertexColors: true,
       transparent: true,
-      opacity: 0.75,
+      opacity: 0.8,
       blending: THREE.AdditiveBlending,
     });
     const particleSystem = new THREE.Points(partGeo, partMat);
     scene.add(particleSystem);
 
-    // 4. Lighting
+    // 3. Dynamic Studio Lighting
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
     scene.add(ambientLight);
 
-    const mainLight = new THREE.PointLight(colors.primary, 3, 50);
-    mainLight.position.set(10, 10, 15);
-    scene.add(mainLight);
+    const keyLight = new THREE.PointLight(colors.primary, 2.5, 60);
+    keyLight.position.set(12, 10, 15);
+    scene.add(keyLight);
 
-    const rimLight = new THREE.PointLight(colors.secondary, 2, 40);
-    rimLight.position.set(-12, -8, -10);
+    const rimLight = new THREE.PointLight(colors.accent, 2.0, 50);
+    rimLight.position.set(-15, -10, -10);
     scene.add(rimLight);
 
-    // Cached window dimensions to avoid style recalculations on mousemove
+    // 4. Input & Resize Handling
     let winWidth = window.innerWidth || 1920;
     let winHeight = window.innerHeight || 1080;
+    let mouseThrottle = 0;
 
-    // Interactive mouse listener
     const handleMouseMove = (e) => {
+      const now = performance.now();
+      if (now - mouseThrottle < 32) return;
+      mouseThrottle = now;
       const normX = (e.clientX / winWidth) * 2 - 1;
       const normY = -(e.clientY / winHeight) * 2 + 1;
       mouseRef.current.targetX = normX;
@@ -183,12 +230,18 @@ export default function AuthCanvas3D({ theme = 'cyan' }) {
       camera.aspect = newW / newH;
       camera.updateProjectionMatrix();
       renderer.setSize(newW, newH);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+      renderer.setPixelRatio(1.0);
+
+      if (offsetLeft && window.innerWidth >= 1024) {
+        masterGroup.position.x = -4.2;
+      } else {
+        masterGroup.position.x = 0;
+      }
     };
 
     window.addEventListener('resize', handleResize, { passive: true });
 
-    // Render loop
+    // 5. Render Loop with IntersectionObserver
     let animId = null;
     let clock = new THREE.Clock();
     let isIntersecting = true;
@@ -201,39 +254,44 @@ export default function AuthCanvas3D({ theme = 'cyan' }) {
       animId = requestAnimationFrame(animate);
       const elapsed = clock.getElapsedTime();
 
-      // Smooth mouse follow
-      mouseRef.current.x += (mouseRef.current.targetX - mouseRef.current.x) * 0.05;
-      mouseRef.current.y += (mouseRef.current.targetY - mouseRef.current.y) * 0.05;
+      // Fluid damped mouse coordinates
+      mouseRef.current.x += (mouseRef.current.targetX - mouseRef.current.x) * 0.035;
+      mouseRef.current.y += (mouseRef.current.targetY - mouseRef.current.y) * 0.035;
 
-      // Rotate central 3D crystal with mouse inertia
-      crystalGroup.rotation.y = elapsed * 0.25 + mouseRef.current.x * 0.5;
-      crystalGroup.rotation.x = Math.sin(elapsed * 0.3) * 0.15 + mouseRef.current.y * 0.3;
+      // Rotate central gem
+      coreMesh.rotation.y = elapsed * 0.2 + mouseRef.current.x * 0.35;
+      coreMesh.rotation.x = Math.sin(elapsed * 0.3) * 0.15 + mouseRef.current.y * 0.2;
 
-      wireCage.rotation.x = -elapsed * 0.18;
-      wireCage.rotation.z = elapsed * 0.12;
+      // Counter-rotate inner wireframe
+      innerMesh.rotation.y = -elapsed * 0.3;
+      innerMesh.rotation.z = elapsed * 0.2;
+      const pulse = 1 + Math.sin(elapsed * 2.5) * 0.06;
+      innerMesh.scale.set(pulse, pulse, pulse);
 
-      orbitalRing1.rotation.z = elapsed * 0.35;
-      orbitalRing2.rotation.x = elapsed * 0.28;
+      // Rotate cage
+      cageMesh.rotation.x = -elapsed * 0.12;
+      cageMesh.rotation.y = elapsed * 0.15;
 
-      // Pulse inner core
-      const scalePulse = 1 + Math.sin(elapsed * 2) * 0.05;
-      innerCrystal.scale.set(scalePulse, scalePulse, scalePulse);
+      // Gimbal rings
+      ringMesh1.rotation.z = elapsed * 0.28;
+      ringMesh2.rotation.x = elapsed * 0.22;
 
       // Orbit satellites
       satellites.forEach((sat) => {
         sat.angle += sat.speed;
         sat.mesh.position.x = Math.cos(sat.angle) * sat.radius;
         sat.mesh.position.z = Math.sin(sat.angle) * sat.radius;
-        sat.mesh.rotation.x += 0.03;
-        sat.mesh.rotation.y += 0.04;
+        sat.mesh.position.y = Math.sin(elapsed * 1.5 + sat.angle) * 0.7 + sat.elevation;
+        sat.mesh.rotation.x += 0.02;
+        sat.mesh.rotation.y += 0.03;
       });
 
       // Ambient particle slow drift
-      particleSystem.rotation.y = elapsed * 0.02;
+      particleSystem.rotation.y = elapsed * 0.012;
 
-      // Subtle dynamic camera float
-      camera.position.x = mouseRef.current.x * 1.8;
-      camera.position.y = mouseRef.current.y * 1.2;
+      // Camera subtle parallax
+      camera.position.x = mouseRef.current.x * 0.9;
+      camera.position.y = mouseRef.current.y * 0.6;
       camera.lookAt(0, 0, 0);
 
       renderer.render(scene, camera);
@@ -253,7 +311,6 @@ export default function AuthCanvas3D({ theme = 'cyan' }) {
       }
     };
 
-    // Start immediately for initial render
     startRendering();
 
     let observer = null;
@@ -270,7 +327,7 @@ export default function AuthCanvas3D({ theme = 'cyan' }) {
     }
 
     return () => {
-      if (animId) cancelAnimationFrame(animId);
+      stopRendering();
       if (observer) observer.disconnect();
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('resize', handleResize);
@@ -278,10 +335,12 @@ export default function AuthCanvas3D({ theme = 'cyan' }) {
         container.removeChild(renderer.domElement);
       }
       renderer.dispose();
+      coreGeo.dispose();
+      coreMat.dispose();
       innerGeo.dispose();
       innerMat.dispose();
-      wireGeo.dispose();
-      wireMat.dispose();
+      cageGeo.dispose();
+      cageMat.dispose();
       ringGeo1.dispose();
       ringMat1.dispose();
       ringGeo2.dispose();
@@ -291,16 +350,16 @@ export default function AuthCanvas3D({ theme = 'cyan' }) {
       partGeo.dispose();
       partMat.dispose();
       ambientLight.dispose();
-      mainLight.dispose();
+      keyLight.dispose();
       rimLight.dispose();
     };
-  }, [theme]);
+  }, [theme, offsetLeft]);
 
   return (
-    <div 
-      ref={mountRef} 
-      className="absolute inset-0 pointer-events-none z-0 overflow-hidden will-change-transform" 
-      aria-hidden="true" 
+    <div
+      ref={mountRef}
+      className="absolute inset-0 pointer-events-none z-0 overflow-hidden will-change-transform"
+      aria-hidden="true"
     />
   );
 }

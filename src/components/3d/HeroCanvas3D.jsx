@@ -28,18 +28,18 @@ export default function HeroCanvas3D({ theme = 'cyan' }) {
 
     const renderer = new THREE.WebGLRenderer({
       alpha: true,
-      antialias: true,
+      antialias: false,
       powerPreference: 'high-performance',
     });
     renderer.setSize(width, height);
-    // Cap pixel ratio to 1.5 to eliminate GPU fill-rate bottleneck
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+    // Fixed 1.0 pixel ratio guarantees featherweight rendering across all monitors
+    renderer.setPixelRatio(1.0);
     container.appendChild(renderer.domElement);
 
     const colors = themeColors[theme] || themeColors.cyan;
 
-    // 2. Cosmic Starfield Particles (optimized point count for smooth 120fps)
-    const starCount = 1800;
+    // 2. Cosmic Starfield Particles (optimized 380 points)
+    const starCount = 380;
     const starGeo = new THREE.BufferGeometry();
     const starPositions = new Float32Array(starCount * 3);
     const starColors = new Float32Array(starCount * 3);
@@ -64,7 +64,7 @@ export default function HeroCanvas3D({ theme = 'cyan' }) {
     starGeo.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
 
     const starMat = new THREE.PointsMaterial({
-      size: 0.18,
+      size: 0.2,
       vertexColors: true,
       transparent: true,
       opacity: 0.85,
@@ -73,20 +73,24 @@ export default function HeroCanvas3D({ theme = 'cyan' }) {
     const starSystem = new THREE.Points(starGeo, starMat);
     scene.add(starSystem);
 
-    // 3. Floating Light Orbs
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    // 3. Floating Ambient Light
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
     scene.add(ambientLight);
 
-    const pointLight = new THREE.PointLight(colors.primary, 2, 80);
+    const pointLight = new THREE.PointLight(colors.primary, 1.8, 80);
     pointLight.position.set(-20, 15, 10);
     scene.add(pointLight);
 
-    // Cached window dimensions to avoid style recalculations on mousemove
+    // Cached window dimensions
     let winWidth = window.innerWidth || 1920;
     let winHeight = window.innerHeight || 1080;
+    let mouseThrottle = 0;
 
-    // Passive mouse listener
+    // Throttled mouse listener to prevent any micro-stutter
     const handleMouseMove = (e) => {
+      const now = performance.now();
+      if (now - mouseThrottle < 32) return; // 30fps throttle on input updates
+      mouseThrottle = now;
       const normX = (e.clientX / winWidth) * 2 - 1;
       const normY = -(e.clientY / winHeight) * 2 + 1;
       mouseRef.current.targetX = normX;
@@ -104,7 +108,7 @@ export default function HeroCanvas3D({ theme = 'cyan' }) {
       camera.aspect = newW / newH;
       camera.updateProjectionMatrix();
       renderer.setSize(newW, newH);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+      renderer.setPixelRatio(1.0);
     };
 
     window.addEventListener('resize', handleResize, { passive: true });
@@ -122,17 +126,12 @@ export default function HeroCanvas3D({ theme = 'cyan' }) {
       animId = requestAnimationFrame(renderFrame);
       const elapsed = clock.getElapsedTime();
 
-      // Mouse inertia
-      mouseRef.current.x += (mouseRef.current.targetX - mouseRef.current.x) * 0.05;
-      mouseRef.current.y += (mouseRef.current.targetY - mouseRef.current.y) * 0.05;
+      // Smooth subtle drift
+      mouseRef.current.x += (mouseRef.current.targetX - mouseRef.current.x) * 0.03;
+      mouseRef.current.y += (mouseRef.current.targetY - mouseRef.current.y) * 0.03;
 
-      // Cosmic drift
-      starSystem.rotation.y = elapsed * 0.015 + mouseRef.current.x * 0.08;
-      starSystem.rotation.x = mouseRef.current.y * 0.05;
-
-      camera.position.x = mouseRef.current.x * 1.5;
-      camera.position.y = mouseRef.current.y * 1.0;
-      camera.lookAt(0, 0, 0);
+      starSystem.rotation.y = elapsed * 0.02 + mouseRef.current.x * 0.06;
+      starSystem.rotation.x = mouseRef.current.y * 0.04;
 
       renderer.render(scene, camera);
     };

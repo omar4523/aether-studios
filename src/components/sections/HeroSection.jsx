@@ -9,14 +9,18 @@ export default function HeroSection({ onOpenIntake, onExploreWork, currentTheme 
       {/* 3D Cosmic Starfield Background */}
       <HeroCanvas3D theme={currentTheme} />
 
-      {/* Atmospheric Nebula Glows (GPU composited) */}
+      {/* Atmospheric Nebula Glows (GPU composited radial gradients without expensive blur filters) */}
       <div 
-        className="pointer-events-none absolute top-1/4 left-1/3 -translate-x-1/2 w-[550px] h-[450px] rounded-full blur-[80px] opacity-25 transform-gpu will-change-transform"
-        style={{ background: 'rgb(var(--color-primary))' }}
+        className="pointer-events-none absolute top-1/4 left-1/3 -translate-x-1/2 w-[600px] h-[500px] rounded-full pointer-events-none"
+        style={{ 
+          background: 'radial-gradient(ellipse at center, rgba(var(--color-primary), 0.18) 0%, rgba(var(--color-primary), 0.05) 45%, transparent 70%)' 
+        }}
       />
       <div 
-        className="pointer-events-none absolute top-1/2 right-1/4 w-[420px] h-[420px] rounded-full blur-[80px] opacity-20 transform-gpu will-change-transform"
-        style={{ background: 'rgb(var(--color-accent))' }}
+        className="pointer-events-none absolute top-1/2 right-1/4 w-[500px] h-[500px] rounded-full pointer-events-none"
+        style={{ 
+          background: 'radial-gradient(ellipse at center, rgba(var(--color-accent), 0.15) 0%, rgba(var(--color-accent), 0.04) 45%, transparent 70%)' 
+        }}
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full my-auto">

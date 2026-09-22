@@ -161,8 +161,6 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#04060A] text-slate-100 flex flex-col antialiased selection:bg-cyan-500/20 selection:text-cyan-300">
       
-      {/* Precision Magnetic Mouse Cursor (0ms latency hardware accelerated) */}
-      <CustomCursor />
 
       {/* Floating Side Quick Dock (Right Side) */}
       {currentView === 'main' && (

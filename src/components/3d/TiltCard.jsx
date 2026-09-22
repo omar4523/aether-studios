@@ -28,9 +28,7 @@ export default function TiltCard({
     const card = cardRef.current;
     if (!card) return;
 
-    if (rafId.current) {
-      cancelAnimationFrame(rafId.current);
-    }
+    if (rafId.current) return;
 
     if (!rectRef.current) {
       rectRef.current = card.getBoundingClientRect();
@@ -46,14 +44,15 @@ export default function TiltCard({
     const rotateY = ((x - centerX) / centerX) * maxTilt;
 
     rafId.current = requestAnimationFrame(() => {
+      rafId.current = null;
       if (!cardRef.current || !isHoveredRef.current) return;
       cardRef.current.style.transform = `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) scale3d(1.02, 1.02, 1.02)`;
 
       if (glare && glareRef.current) {
         const glareX = (x / rect.width) * 100;
         const glareY = (y / rect.height) * 100;
-        glareRef.current.style.opacity = '0.18';
-        glareRef.current.style.background = `radial-gradient(circle at ${glareX.toFixed(1)}% ${glareY.toFixed(1)}%, rgba(255, 255, 255, 0.7) 0%, transparent 60%)`;
+        glareRef.current.style.opacity = '0.15';
+        glareRef.current.style.background = `radial-gradient(circle at ${glareX.toFixed(1)}% ${glareY.toFixed(1)}%, rgba(255, 255, 255, 0.6) 0%, transparent 60%)`;
       }
     });
   };

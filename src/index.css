@@ -116,20 +116,15 @@ body[data-theme="gold"] {
   to { transform: rotate(360deg); }
 }
 
-/* Hide default cursor on desktop when custom cursor is active, without universal * selector */
+/* Enable standard responsive native hardware cursor across all devices for zero input latency */
 @media (hover: hover) and (pointer: fine) {
-  html.custom-cursor-active,
-  body.custom-cursor-active,
-  body.custom-cursor-active a,
-  body.custom-cursor-active button,
-  body.custom-cursor-active [role="button"],
-  body.custom-cursor-active .cursor-pointer {
-    cursor: none !important;
+  html, body {
+    cursor: default;
   }
-  body.custom-cursor-active input,
-  body.custom-cursor-active textarea,
-  body.custom-cursor-active select,
-  body.custom-cursor-active [contenteditable="true"] {
-    cursor: text !important;
+  a, button, [role="button"], .cursor-pointer {
+    cursor: pointer;
+  }
+  input, textarea, select, [contenteditable="true"] {
+    cursor: text;
   }
 }
