@@ -8,17 +8,18 @@ import {
   User, 
   Settings, 
   Bell, 
-  MoreVertical, 
   CheckCircle2, 
   Clock, 
   Send, 
   ArrowLeft, 
-  ExternalLink,
-  ChevronRight,
-  ShieldCheck,
-  Sparkles,
-  Download,
-  AlertCircle
+  ExternalLink, 
+  ShieldCheck, 
+  Sparkles, 
+  Download, 
+  PlusCircle,
+  Inbox,
+  Terminal,
+  Circle
 } from 'lucide-react';
 import AetherLogo from './AetherLogo';
 import { soundEffects } from '../../utils/soundFx';
@@ -32,8 +33,14 @@ export default function ClientPortalModal({
   onOpenIntake
 }) {
   const [activeNav, setActiveNav] = useState('projects');
+  // Default to 'guest' empty project if current user is guest or requested
+  const isGuestUser = currentUser?.isGuest || initialProjectId === 'AE-GUEST-001' || initialProjectId === 'AE-GUEST-2026';
+  const [selectedProjectId, setSelectedProjectId] = useState(isGuestUser ? 'guest' : 'A-2847');
   const [messageInput, setMessageInput] = useState('');
-  const [messages, setMessages] = useState([
+  
+  // Empty guest messages state vs sample messages
+  const [guestMessages, setGuestMessages] = useState([]);
+  const [sampleMessages, setSampleMessages] = useState([
     {
       id: 1,
       time: 'Sep 25, 2025 • 11:42 AM',
@@ -63,13 +70,16 @@ export default function ClientPortalModal({
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
+      if (currentUser?.isGuest) {
+        setSelectedProjectId('guest');
+      }
     } else {
       document.body.style.overflow = 'unset';
     }
     return () => {
       document.body.style.overflow = 'unset';
     };
-  }, [isOpen]);
+  }, [isOpen, currentUser]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -87,6 +97,8 @@ export default function ClientPortalModal({
 
   if (!isOpen) return null;
 
+  const isCurrentEmptyGuest = selectedProjectId === 'guest';
+
   const handleSendMessage = (e) => {
     e.preventDefault();
     if (!messageInput.trim()) return;
@@ -94,11 +106,16 @@ export default function ClientPortalModal({
     const newMsg = {
       id: Date.now(),
       time: 'Just now',
-      author: currentUser?.name || 'Omar Mohamed',
+      author: currentUser?.name || 'Guest Client',
       text: messageInput.trim(),
       status: 'client'
     };
-    setMessages([newMsg, ...messages]);
+
+    if (isCurrentEmptyGuest) {
+      setGuestMessages([newMsg, ...guestMessages]);
+    } else {
+      setSampleMessages([newMsg, ...sampleMessages]);
+    }
     setMessageInput('');
   };
 
@@ -106,46 +123,43 @@ export default function ClientPortalModal({
     soundEffects.playClick();
     const contractText = `=====================================================
 AETHER STUDIOS - DIGITAL CLIENT SERVICE AGREEMENT
-Project Ref: #A-2847 (E-Commerce Website)
-Client: ${currentUser?.name || 'Omar Mohamed'}
-Contract Date: September 20, 2025
-Budget: $299.00 USD (Fully Paid / Verified)
-Delivery Target: October 10, 2025
+Project Ref: #${isCurrentEmptyGuest ? 'AE-GUEST-001' : 'A-2847'} (${isCurrentEmptyGuest ? 'New Client Workspace' : 'E-Commerce Website'})
+Client: ${currentUser?.name || 'Guest Client'}
+Contract Date: ${isCurrentEmptyGuest ? 'Pending Execution' : 'September 20, 2025'}
+Budget: ${isCurrentEmptyGuest ? '$0.00 USD (Awaiting Project Scope)' : '$299.00 USD (Verified Deposit)'}
+Delivery Target: ${isCurrentEmptyGuest ? 'To Be Determined Upon Intake' : 'October 10, 2025'}
 =====================================================
 
 1. SCOPE OF SERVICES
-Aether Studios agrees to deliver a custom, full-stack E-Commerce Website featuring:
-- Responsive desktop, tablet, and mobile interface design
-- Stripe/PayPal secure payment checkout architecture
-- Admin inventory management dashboard
-- 100% intellectual property & source code handover
+${isCurrentEmptyGuest 
+  ? 'Workspace initiated in fresh state. Scope of work to be specified upon project submission.' 
+  : 'Aether Studios agrees to deliver a custom, full-stack E-Commerce Website featuring responsive UI, payment architecture, and admin dashboard.'}
 
 2. INTELLECTUAL PROPERTY
 Upon final delivery, the Client retains exclusive, perpetual ownership of all code,
 design files, and database schemas developed under this project.
 
-3. SUPPORT & WARRANTY
-Aether Studios provides 30 days of complimentary post-launch support and bug fixes.
-
 Signed:
 Aether Studios Lead Architect
-Omar Mohamed (Client)`;
+${currentUser?.name || 'Guest Client'}`;
 
     const blob = new Blob([contractText], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `Aether-Contract-A-2847.txt`;
+    a.download = `Aether-Contract-${isCurrentEmptyGuest ? 'GUEST-001' : 'A-2847'}.txt`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   };
 
+  const activeMessages = isCurrentEmptyGuest ? guestMessages : sampleMessages;
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-black/90 backdrop-blur-xl animate-in fade-in duration-200">
       
-      {/* Background Click to dismiss */}
+      {/* Background overlay click to dismiss */}
       <div className="fixed inset-0" onClick={onClose} />
 
       {/* Main Dashboard Window matching Bottom-Left Mockup */}
@@ -230,12 +244,45 @@ Omar Mohamed (Client)`;
         <div className="flex-1 flex flex-col overflow-y-auto bg-[#030712]">
           
           {/* TOP BREADCRUMB & USER BAR matching Mockup */}
-          <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between shrink-0 bg-[#040814]/80 backdrop-blur-md">
-            {/* Breadcrumb */}
+          <div className="px-6 py-4 border-b border-white/10 flex flex-wrap items-center justify-between gap-4 shrink-0 bg-[#040814]/80 backdrop-blur-md">
+            
+            {/* Breadcrumb with Workspace Switcher */}
             <div className="flex items-center gap-2 text-xs font-mono text-slate-400">
-              <span className="hover:text-white cursor-pointer transition-colors">‹ My Projects</span>
+              <span className="hover:text-white transition-colors">‹ My Projects</span>
               <span>›</span>
-              <span className="text-cyan-400 font-bold">Project #A-2847</span>
+              <span className="text-cyan-400 font-bold">
+                {isCurrentEmptyGuest ? 'Project #AE-GUEST-001 (Empty Workspace)' : 'Project #A-2847'}
+              </span>
+
+              {/* Toggle between Empty Guest Workspace & Demo */}
+              <div className="hidden sm:inline-flex items-center p-0.5 ml-3 rounded-lg bg-white/5 border border-white/10 text-[10px]">
+                <button
+                  onClick={() => {
+                    soundEffects.playClick();
+                    setSelectedProjectId('guest');
+                  }}
+                  className={`px-2.5 py-1 rounded-md transition-all font-mono ${
+                    isCurrentEmptyGuest
+                      ? 'bg-cyan-500/20 text-cyan-300 font-bold border border-cyan-400/40'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  Empty Workspace (0%)
+                </button>
+                <button
+                  onClick={() => {
+                    soundEffects.playClick();
+                    setSelectedProjectId('A-2847');
+                  }}
+                  className={`px-2.5 py-1 rounded-md transition-all font-mono ${
+                    !isCurrentEmptyGuest
+                      ? 'bg-cyan-500/20 text-cyan-300 font-bold border border-cyan-400/40'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  Sample Demo (#A-2847)
+                </button>
+              </div>
             </div>
 
             {/* Right: Notifications & User Profile */}
@@ -251,16 +298,16 @@ Omar Mohamed (Client)`;
 
               <div className="flex items-center gap-2.5 pl-2 border-l border-white/10">
                 <img 
-                  src={currentUser?.avatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80"} 
+                  src={currentUser?.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80"} 
                   alt="Avatar" 
                   className="w-8 h-8 rounded-full object-cover border border-cyan-400/40"
                 />
                 <div className="hidden sm:flex flex-col text-left leading-tight">
                   <span className="text-xs font-bold text-white">
-                    {currentUser?.name || 'Omar Mohamed'}
+                    {currentUser?.name || (isCurrentEmptyGuest ? 'Guest Client' : 'Omar Mohamed')}
                   </span>
                   <span className="text-[10px] font-mono text-slate-400">
-                    {currentUser?.role || 'Client'}
+                    {currentUser?.role || (isCurrentEmptyGuest ? 'Guest Explorer' : 'Client')}
                   </span>
                 </div>
               </div>
@@ -282,22 +329,33 @@ Omar Mohamed (Client)`;
               <div className="text-left space-y-1.5 max-w-2xl">
                 <div className="flex items-center gap-3">
                   <h1 className="text-2xl sm:text-3xl font-display font-extrabold text-white">
-                    E-Commerce Website
+                    {isCurrentEmptyGuest ? 'New Project Workspace' : 'E-Commerce Website'}
                   </h1>
-                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-mono font-bold flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    <span>In Progress</span>
-                  </span>
+
+                  {/* Status Badge */}
+                  {isCurrentEmptyGuest ? (
+                    <span className="px-2.5 py-0.5 rounded-full bg-slate-800/80 border border-slate-700 text-slate-300 text-xs font-mono font-bold flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                      <span>Not Started Yet</span>
+                    </span>
+                  ) : (
+                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-mono font-bold flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                      <span>In Progress</span>
+                    </span>
+                  )}
                 </div>
 
                 <p className="text-xs sm:text-sm text-slate-400">
-                  Modern online store with secure payments, admin dashboard and responsive design.
+                  {isCurrentEmptyGuest 
+                    ? 'Welcome to your dedicated workspace. No project has been started yet. Start an intake to launch your sprint.' 
+                    : 'Modern online store with secure payments, admin dashboard and responsive design.'}
                 </p>
               </div>
 
               {/* Floating 3D Crystal Gem in Top Right matching Mockup */}
               <div className="hidden md:flex items-center justify-center shrink-0 w-24 h-24 relative pointer-events-none">
-                <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-[0_0_30px_rgba(0,242,254,0.3)] animate-pulse">
+                <div className={`w-20 h-20 rounded-2xl overflow-hidden shadow-[0_0_30px_rgba(0,242,254,0.3)] ${isCurrentEmptyGuest ? 'opacity-60 grayscale-[30%]' : 'animate-pulse'}`}>
                   <img 
                     src="/aether_prism_cube.jpg" 
                     alt="3D Quantum Core" 
@@ -316,9 +374,9 @@ Omar Mohamed (Client)`;
                 <div className="absolute top-3.5 left-6 right-6 h-0.5 bg-slate-800 -z-0" />
 
                 {[
-                  { label: 'Planning', status: 'completed' },
-                  { label: 'Design', status: 'completed' },
-                  { label: 'Development', status: 'active' },
+                  { label: 'Planning', status: isCurrentEmptyGuest ? 'pending' : 'completed' },
+                  { label: 'Design', status: isCurrentEmptyGuest ? 'pending' : 'completed' },
+                  { label: 'Development', status: isCurrentEmptyGuest ? 'pending' : 'active' },
                   { label: 'Testing', status: 'pending' },
                   { label: 'Delivery', status: 'pending' },
                 ].map((step, idx) => {
@@ -333,7 +391,7 @@ Omar Mohamed (Client)`;
                           ? 'bg-emerald-500 text-slate-950 shadow-[0_0_12px_rgba(16,185,129,0.5)]'
                           : isActive
                           ? 'bg-cyan-500 text-slate-950 ring-4 ring-cyan-500/20 shadow-[0_0_15px_rgba(0,242,254,0.6)] animate-pulse'
-                          : 'bg-slate-900 border border-slate-700 text-slate-500'
+                          : 'bg-slate-900 border border-slate-700 text-slate-600'
                       }`}>
                         {isDone ? '✓' : isActive ? '◉' : '○'}
                       </div>
@@ -343,8 +401,8 @@ Omar Mohamed (Client)`;
                       }`}>
                         {step.label}
                       </span>
-                      <span className="text-[10px] text-slate-500 capitalize">
-                        {step.status === 'active' ? 'In Progress' : step.status}
+                      <span className="text-[10px] text-slate-600 capitalize">
+                        {isCurrentEmptyGuest ? 'Not Started' : (step.status === 'active' ? 'In Progress' : step.status)}
                       </span>
                     </div>
                   );
@@ -367,50 +425,79 @@ Omar Mohamed (Client)`;
                 <div className="space-y-3.5 text-xs">
                   <div className="flex items-center justify-between pb-2 border-b border-white/5">
                     <span className="text-slate-400">Project ID</span>
-                    <span className="font-mono text-cyan-400 font-bold">#A-2847</span>
+                    <span className="font-mono text-cyan-400 font-bold">
+                      {isCurrentEmptyGuest ? '#AE-GUEST-001' : '#A-2847'}
+                    </span>
                   </div>
 
                   <div className="flex items-center justify-between pb-2 border-b border-white/5">
                     <span className="text-slate-400">Type</span>
-                    <span className="text-white font-medium">E-Commerce Website</span>
+                    <span className="text-white font-medium">
+                      {isCurrentEmptyGuest ? 'Not Selected Yet' : 'E-Commerce Website'}
+                    </span>
                   </div>
 
                   <div className="flex items-center justify-between pb-2 border-b border-white/5">
                     <span className="text-slate-400">Start Date</span>
-                    <span className="font-mono text-slate-300">Sep 20, 2025</span>
+                    <span className="font-mono text-slate-300">
+                      {isCurrentEmptyGuest ? '—' : 'Sep 20, 2025'}
+                    </span>
                   </div>
 
                   <div className="flex items-center justify-between pb-2 border-b border-white/5">
                     <span className="text-slate-400">Estimated Delivery</span>
-                    <span className="font-mono text-slate-300">Oct 10, 2025</span>
+                    <span className="font-mono text-slate-300">
+                      {isCurrentEmptyGuest ? '—' : 'Oct 10, 2025'}
+                    </span>
                   </div>
 
                   <div className="flex items-center justify-between pb-2 border-b border-white/5">
                     <span className="text-slate-400">Budget</span>
-                    <span className="font-mono text-emerald-400 font-bold text-sm">$299</span>
+                    <span className="font-mono text-emerald-400 font-bold text-sm">
+                      {isCurrentEmptyGuest ? '$0.00' : '$299'}
+                    </span>
                   </div>
 
                   <div className="flex items-center justify-between">
                     <span className="text-slate-400">Status</span>
-                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 font-mono text-[11px] font-bold flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                      <span>In Progress</span>
-                    </span>
+                    {isCurrentEmptyGuest ? (
+                      <span className="px-2.5 py-0.5 rounded-full bg-slate-800 border border-slate-700 text-slate-400 font-mono text-[11px] font-bold">
+                        Not Started
+                      </span>
+                    ) : (
+                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 font-mono text-[11px] font-bold flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                        <span>In Progress</span>
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>
 
-              {/* View Contract Button */}
-              <button
-                onClick={() => {
-                  soundEffects.playClick();
-                  setIsContractOpen(true);
-                }}
-                className="w-full mt-6 py-2.5 px-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-xs font-mono font-bold text-slate-200 hover:text-white transition-all text-center flex items-center justify-center gap-2 active:scale-[0.99]"
-              >
-                <FileText className="w-3.5 h-3.5 text-cyan-400" />
-                <span>View Contract</span>
-              </button>
+              {/* Action Button */}
+              {isCurrentEmptyGuest ? (
+                <button
+                  onClick={() => {
+                    soundEffects.playClick();
+                    if (onOpenIntake) onOpenIntake();
+                  }}
+                  className="w-full mt-6 py-2.5 px-4 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:opacity-95 text-slate-950 font-display font-bold text-xs shadow-md transition-all text-center flex items-center justify-center gap-2 active:scale-[0.99]"
+                >
+                  <PlusCircle className="w-4 h-4" />
+                  <span>Start a New Project Now</span>
+                </button>
+              ) : (
+                <button
+                  onClick={() => {
+                    soundEffects.playClick();
+                    setIsContractOpen(true);
+                  }}
+                  className="w-full mt-6 py-2.5 px-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-xs font-mono font-bold text-slate-200 hover:text-white transition-all text-center flex items-center justify-center gap-2 active:scale-[0.99]"
+                >
+                  <FileText className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>View Contract</span>
+                </button>
+              )}
             </div>
 
             {/* CARD 2: Current Progress matching Mockup */}
@@ -420,85 +507,116 @@ Omar Mohamed (Client)`;
                   <h3 className="text-base font-display font-bold text-white">
                     Current Progress
                   </h3>
-                  <span className="text-xs font-mono font-bold text-cyan-400">65%</span>
+                  <span className="text-xs font-mono font-bold text-cyan-400">
+                    {isCurrentEmptyGuest ? '0%' : '65%'}
+                  </span>
                 </div>
 
-                {/* 65% Progress Bar */}
+                {/* Progress Bar */}
                 <div className="w-full h-2 rounded-full bg-white/10 overflow-hidden mb-5">
-                  <div className="h-full bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full w-[65%]" />
+                  <div 
+                    className="h-full bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full transition-all duration-500" 
+                    style={{ width: isCurrentEmptyGuest ? '0%' : '65%' }}
+                  />
                 </div>
 
-                {/* Checklist Tasks matching Mockup */}
+                {/* Checklist Tasks */}
                 <div className="space-y-3 text-xs">
-                  
-                  {/* Task 1 */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                      <div>
-                        <div className="text-slate-200 font-medium leading-tight">Project Setup & Requirements</div>
-                        <div className="text-[10px] text-slate-500 font-mono">Sep 20, 2025</div>
+                  {isCurrentEmptyGuest ? (
+                    <>
+                      {/* Empty state tasks */}
+                      {[
+                        'Project Setup & Requirements',
+                        'UI/UX Design',
+                        'Frontend Development',
+                        'Backend Development',
+                        'Testing & Bug Fixes',
+                        'Final Delivery'
+                      ].map((t) => (
+                        <div key={t} className="flex items-center justify-between text-slate-500">
+                          <div className="flex items-center gap-2">
+                            <Circle className="w-3.5 h-3.5 text-slate-700 shrink-0" />
+                            <span className="text-slate-400">{t}</span>
+                          </div>
+                          <span className="text-[10px] font-mono text-slate-600">Pending</span>
+                        </div>
+                      ))}
+                      <div className="mt-4 p-3 rounded-xl bg-white/[0.02] border border-white/5 text-[11px] text-slate-400 leading-relaxed text-center">
+                        No tasks in progress yet. Your roadmap tasks will unlock automatically upon kickoff.
                       </div>
-                    </div>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-semibold">
-                      Completed
-                    </span>
-                  </div>
-
-                  {/* Task 2 */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                      <div>
-                        <div className="text-slate-200 font-medium leading-tight">UI/UX Design</div>
-                        <div className="text-[10px] text-slate-500 font-mono">Sep 23, 2025</div>
+                    </>
+                  ) : (
+                    <>
+                      {/* Task 1 */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                          <div>
+                            <div className="text-slate-200 font-medium leading-tight">Project Setup & Requirements</div>
+                            <div className="text-[10px] text-slate-500 font-mono">Sep 20, 2025</div>
+                          </div>
+                        </div>
+                        <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-semibold">
+                          Completed
+                        </span>
                       </div>
-                    </div>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-semibold">
-                      Completed
-                    </span>
-                  </div>
 
-                  {/* Task 3 */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Clock className="w-4 h-4 text-cyan-400 shrink-0 animate-spin" />
-                      <div>
-                        <div className="text-white font-bold leading-tight">Frontend Development</div>
-                        <div className="text-[10px] text-cyan-400 font-mono">Sep 29, 2025 • Active</div>
+                      {/* Task 2 */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                          <div>
+                            <div className="text-slate-200 font-medium leading-tight">UI/UX Design</div>
+                            <div className="text-[10px] text-slate-500 font-mono">Sep 23, 2025</div>
+                          </div>
+                        </div>
+                        <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-semibold">
+                          Completed
+                        </span>
                       </div>
-                    </div>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-400/40 font-bold">
-                      In Progress
-                    </span>
-                  </div>
 
-                  {/* Task 4 */}
-                  <div className="flex items-center justify-between text-slate-500">
-                    <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 rounded-full border border-slate-700 shrink-0" />
-                      <span className="text-slate-400">Backend Development</span>
-                    </div>
-                    <span className="text-[10px] font-mono text-slate-600">Pending</span>
-                  </div>
+                      {/* Task 3 */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Clock className="w-4 h-4 text-cyan-400 shrink-0 animate-spin" />
+                          <div>
+                            <div className="text-white font-bold leading-tight">Frontend Development</div>
+                            <div className="text-[10px] text-cyan-400 font-mono">Sep 29, 2025 • Active</div>
+                          </div>
+                        </div>
+                        <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-400/40 font-bold">
+                          In Progress
+                        </span>
+                      </div>
 
-                  {/* Task 5 */}
-                  <div className="flex items-center justify-between text-slate-500">
-                    <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 rounded-full border border-slate-700 shrink-0" />
-                      <span className="text-slate-400">Testing & Bug Fixes</span>
-                    </div>
-                    <span className="text-[10px] font-mono text-slate-600">Pending</span>
-                  </div>
+                      {/* Task 4 */}
+                      <div className="flex items-center justify-between text-slate-500">
+                        <div className="flex items-center gap-2">
+                          <div className="w-4 h-4 rounded-full border border-slate-700 shrink-0" />
+                          <span className="text-slate-400">Backend Development</span>
+                        </div>
+                        <span className="text-[10px] font-mono text-slate-600">Pending</span>
+                      </div>
 
-                  {/* Task 6 */}
-                  <div className="flex items-center justify-between text-slate-500">
-                    <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 rounded-full border border-slate-700 shrink-0" />
-                      <span className="text-slate-400">Final Delivery</span>
-                    </div>
-                    <span className="text-[10px] font-mono text-slate-600">Pending</span>
-                  </div>
+                      {/* Task 5 */}
+                      <div className="flex items-center justify-between text-slate-500">
+                        <div className="flex items-center gap-2">
+                          <div className="w-4 h-4 rounded-full border border-slate-700 shrink-0" />
+                          <span className="text-slate-400">Testing & Bug Fixes</span>
+                        </div>
+                        <span className="text-[10px] font-mono text-slate-600">Pending</span>
+                      </div>
+
+                      {/* Task 6 */}
+                      <div className="flex items-center justify-between text-slate-500">
+                        <div className="flex items-center gap-2">
+                          <div className="w-4 h-4 rounded-full border border-slate-700 shrink-0" />
+                          <span className="text-slate-400">Final Delivery</span>
+                        </div>
+                        <span className="text-[10px] font-mono text-slate-600">Pending</span>
+                      </div>
+                    </>
+                  )}
 
                 </div>
               </div>
@@ -511,28 +629,38 @@ Omar Mohamed (Client)`;
                   Live Updates
                 </h3>
 
-                {/* Timeline Feed matching Mockup */}
+                {/* Timeline Feed */}
                 <div className="space-y-4 text-xs max-h-56 overflow-y-auto pr-1">
-                  {messages.map((item) => (
-                    <div key={item.id} className="relative pl-4 border-l-2 border-cyan-400/40 pb-1">
-                      <span className="absolute -left-[5px] top-1 w-2 h-2 rounded-full bg-cyan-400" />
-                      <div className="text-[10px] font-mono text-cyan-300 font-semibold mb-0.5">
-                        {item.time}
-                      </div>
-                      <p className="text-xs text-slate-300 leading-relaxed font-normal">
-                        {item.text}
+                  {activeMessages.length === 0 ? (
+                    <div className="py-10 px-4 text-center flex flex-col items-center justify-center space-y-2.5 text-slate-500">
+                      <Inbox className="w-8 h-8 text-slate-600" />
+                      <div className="text-xs font-bold text-slate-300">No updates yet</div>
+                      <p className="text-[11px] text-slate-400 max-w-[240px] leading-relaxed">
+                        Your project timeline, designer check-ins, and build logs will appear here once your sprint starts.
                       </p>
                     </div>
-                  ))}
+                  ) : (
+                    activeMessages.map((item) => (
+                      <div key={item.id} className="relative pl-4 border-l-2 border-cyan-400/40 pb-1">
+                        <span className="absolute -left-[5px] top-1 w-2 h-2 rounded-full bg-cyan-400" />
+                        <div className="text-[10px] font-mono text-cyan-300 font-semibold mb-0.5">
+                          {item.time} {item.author && `• ${item.author}`}
+                        </div>
+                        <p className="text-xs text-slate-300 leading-relaxed font-normal">
+                          {item.text}
+                        </p>
+                      </div>
+                    ))
+                  )}
                   <div ref={messagesEndRef} />
                 </div>
               </div>
 
-              {/* Chat Input matching Mockup */}
+              {/* Chat Input */}
               <form onSubmit={handleSendMessage} className="mt-4 pt-3 border-t border-white/10 relative flex items-center gap-2">
                 <input
                   type="text"
-                  placeholder="Type a message..."
+                  placeholder={isCurrentEmptyGuest ? "Type project requirements or ask a question..." : "Type a message..."}
                   value={messageInput}
                   onChange={(e) => setMessageInput(e.target.value)}
                   className="w-full bg-[#0D152B] border border-white/15 rounded-xl px-3.5 py-2 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-400 pr-10 transition-colors"
@@ -561,7 +689,9 @@ Omar Mohamed (Client)`;
             <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-4">
               <div className="flex items-center gap-2">
                 <ShieldCheck className="w-5 h-5 text-cyan-400" />
-                <h4 className="text-base font-bold text-white">Client Service Contract #A-2847</h4>
+                <h4 className="text-base font-bold text-white">
+                  Client Service Contract #{isCurrentEmptyGuest ? 'AE-GUEST-001' : 'A-2847'}
+                </h4>
               </div>
               <button 
                 onClick={() => setIsContractOpen(false)}
@@ -572,10 +702,12 @@ Omar Mohamed (Client)`;
             </div>
 
             <div className="p-4 rounded-xl bg-black/40 border border-white/5 font-mono text-[11px] text-slate-300 space-y-2 mb-5">
-              <div className="text-cyan-300 font-bold">PROJECT: E-Commerce Website (#A-2847)</div>
-              <div>CLIENT: {currentUser?.name || 'Omar Mohamed'}</div>
-              <div>DELIVERY TARGET: October 10, 2025</div>
-              <div>TOTAL BUDGET: $299.00 USD (Verified Deposit)</div>
+              <div className="text-cyan-300 font-bold">
+                PROJECT: {isCurrentEmptyGuest ? 'New Client Workspace (#AE-GUEST-001)' : 'E-Commerce Website (#A-2847)'}
+              </div>
+              <div>CLIENT: {currentUser?.name || (isCurrentEmptyGuest ? 'Guest Client' : 'Omar Mohamed')}</div>
+              <div>DELIVERY TARGET: {isCurrentEmptyGuest ? 'Pending Scope' : 'October 10, 2025'}</div>
+              <div>TOTAL BUDGET: {isCurrentEmptyGuest ? '$0.00 USD (Pending Scope)' : '$299.00 USD (Verified Deposit)'}</div>
               <div className="pt-2 text-slate-400">
                 TERMS: 100% full intellectual property handover upon completion. Standard 30-day post-launch warranty included.
               </div>

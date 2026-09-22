@@ -81,13 +81,13 @@ export default function AuthPage({
     triggerConfetti();
 
     const guestUser = {
-      name: 'Omar Mohamed',
-      email: 'omar.client@aetherstudios.dev',
-      role: 'Client',
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
-      projectId: 'A-2847',
-      projectTitle: 'E-Commerce Website',
-      accountType: 'business',
+      name: 'Guest Client',
+      email: 'guest@aetherstudios.dev',
+      role: 'Guest Explorer',
+      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80',
+      projectId: 'AE-GUEST-001',
+      projectTitle: 'New Project Workspace',
+      accountType: 'guest',
       isGuest: true
     };
 

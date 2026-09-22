@@ -187,13 +187,13 @@ export default function App() {
                 <span>VIP Guest Preview Active</span>
               </div>
               <div className="text-[10px] font-mono text-cyan-300">
-                Project #AE-GUEST-2026 Live
+                Workspace #AE-GUEST-001 (0% Started)
               </div>
             </div>
           </div>
           <div className="flex items-center gap-1.5">
             <button
-              onClick={() => handleOpenPortal('AE-GUEST-2026')}
+              onClick={() => handleOpenPortal('AE-GUEST-001')}
               className="px-3 py-1.5 rounded-lg bg-cyan-400 text-slate-950 font-mono text-xs font-bold hover:bg-cyan-300 transition-colors flex items-center gap-1 shadow-sm"
             >
               <Terminal className="w-3.5 h-3.5" />
