@@ -1,313 +1,472 @@
 import React, { useState } from 'react';
 import { 
   X, 
+  ArrowLeft, 
   ExternalLink, 
   CheckCircle2, 
-  ChevronLeft, 
-  ChevronRight, 
-  Sparkles, 
+  Clock, 
   Layers, 
-  Check, 
-  ArrowLeft, 
-  ArrowRight,
-  ShieldCheck,
-  Clock,
-  Star
+  ChevronRight, 
+  FileText, 
+  FolderKanban, 
+  MessageSquare, 
+  Activity, 
+  Download,
+  Calendar,
+  DollarSign,
+  Sparkles
 } from 'lucide-react';
-import { portfolioData } from '../../data/portfolioData';
+import AetherLogo from '../ui/AetherLogo';
 import { soundEffects } from '../../utils/soundFx';
 
-export default function ProjectDetailModal({ project, isOpen, onClose, onOpenIntake, onSelectProject }) {
-  if (!isOpen || !project) return null;
+export default function ProjectDetailModal({ 
+  project, 
+  isOpen, 
+  onClose, 
+  onOpenIntake 
+}) {
+  const [activeSubTab, setActiveSubTab] = useState('overview');
+  const [isFilesModalOpen, setIsFilesModalOpen] = useState(false);
 
-  const currentIndex = portfolioData.findIndex((p) => p.id === project.id);
-  
-  const handlePrev = () => {
-    soundEffects.playClick();
-    const prevIndex = (currentIndex - 1 + portfolioData.length) % portfolioData.length;
-    if (onSelectProject) onSelectProject(portfolioData[prevIndex]);
+  if (!isOpen) return null;
+
+  const currentProject = project || {
+    id: 'travel-platform',
+    title: 'Travel Platform',
+    category: 'Full-Stack Platform',
+    status: 'In Progress',
+    description: 'A modern travel booking platform with hotels, flights, and attractions.',
+    about: 'This project is a complete travel platform that allows users to search for hotels, flights, restaurants, and attractions. The platform includes a modern, responsive design, user accounts, and an easy booking process.',
+    technologies: ['Next.js', 'TypeScript', 'Tailwind CSS', 'Supabase'],
+    budget: '$599',
+    deliveryDate: 'Oct 15, 2025',
+    progress: 45,
+    liveUrl: 'https://travel-demo.aetherstudios.dev'
   };
 
-  const handleNext = () => {
+  const handleLaunchLive = () => {
     soundEffects.playClick();
-    const nextIndex = (currentIndex + 1) % portfolioData.length;
-    if (onSelectProject) onSelectProject(portfolioData[nextIndex]);
+    if (currentProject.liveUrl) {
+      window.open(currentProject.liveUrl, '_blank');
+    }
   };
 
-  const displayImage = project.multiDeviceImage || project.image;
-  const techList = project.technologies || project.tagBadges || [];
+  const handleDownloadFiles = () => {
+    soundEffects.playSuccess();
+    const manifest = `AETHER STUDIOS - SOURCE PACKAGE MANIFEST
+Project: Travel Platform (#A-TRAVEL-2025)
+Stack: Next.js 15, TypeScript, Tailwind CSS, Supabase PostgreSQL
+Client: Omar Mohamed (Verified)
+
+DELIVERABLES:
+1. /frontend - Responsive Web Application (App Router, Tailwind CSS)
+2. /supabase - Database Migrations, RLS Security Policies & Edge Functions
+3. /figma - Full Design System (Typography, Components, 3D Assets)
+4. /docs - API Specification & Deployment Guide (Vercel Ready)
+
+Signed: Aether Studios Core Engineering Team`;
+
+    const blob = new Blob([manifest], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Aether-Travel-Platform-Files.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-xl animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-black/90 backdrop-blur-xl animate-in fade-in duration-200">
+      
+      {/* Background overlay click */}
       <div className="fixed inset-0" onClick={onClose} />
 
-      <div className="relative bg-[#070A11] border border-white/20 max-w-5xl w-full rounded-3xl p-6 sm:p-8 shadow-2xl z-10 max-h-[92vh] overflow-y-auto text-left text-slate-100">
+      {/* Main Project Detail Showcase Window matching Bottom-Right Mockup */}
+      <div className="relative bg-[#050A18] border border-white/15 max-w-7xl w-full h-[94vh] rounded-3xl shadow-[0_25px_80px_-15px_rgba(0,0,0,0.9)] z-10 overflow-hidden flex flex-col lg:flex-row text-slate-100">
         
-        {/* Top Header Bar: Back Button, Breadcrumb, and Close */}
-        <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-6">
-          <button
-            onClick={onClose}
-            className="flex items-center gap-2 text-xs font-mono text-slate-400 hover:text-white transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Back to Projects</span>
-          </button>
+        {/* ================= LEFT INNER SIDEBAR matching Mockup ================= */}
+        <aside className="w-full lg:w-60 bg-[#060D1E] border-b lg:border-b-0 lg:border-r border-white/10 p-5 flex flex-col justify-between shrink-0">
+          <div>
+            {/* Top Brand Logo */}
+            <div className="flex items-center justify-between mb-8">
+              <AetherLogo showText={true} />
+              <button 
+                onClick={onClose} 
+                className="lg:hidden p-1.5 rounded-lg text-slate-400 hover:text-white"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
 
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-mono px-3 py-1 rounded-full bg-[rgb(var(--color-primary))]/15 text-[rgb(var(--color-primary))] border border-[rgb(var(--color-primary))]/30 font-semibold">
-              {project.duration}
-            </span>
+            {/* Inner Nav Links matching Mockup */}
+            <nav className="space-y-1.5 text-xs font-medium">
+              {[
+                { id: 'overview', label: 'Overview', icon: FolderKanban, active: true },
+                { id: 'designs', label: 'Designs', icon: Layers },
+                { id: 'development', label: 'Development', icon: Activity },
+                { id: 'timeline', label: 'Timeline', icon: Clock },
+                { id: 'files', label: 'Files', icon: FileText },
+                { id: 'messages', label: 'Messages', icon: MessageSquare },
+              ].map((item) => {
+                const Icon = item.icon;
+                const isActive = activeSubTab === item.id || item.active;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => {
+                      soundEffects.playClick();
+                      setActiveSubTab(item.id);
+                      if (item.id === 'files') setIsFilesModalOpen(true);
+                    }}
+                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${
+                      isActive
+                        ? 'bg-gradient-to-r from-blue-600/25 to-cyan-500/20 border border-cyan-400/40 text-cyan-300 font-semibold shadow-[0_0_15px_rgba(0,242,254,0.15)]'
+                        : 'text-slate-400 hover:text-white hover:bg-white/5'
+                    }`}
+                  >
+                    <Icon className={`w-4 h-4 ${isActive ? 'text-cyan-400' : 'text-slate-400'}`} />
+                    <span>{item.label}</span>
+                  </button>
+                );
+              })}
+            </nav>
+          </div>
+
+          {/* Bottom Quick Return */}
+          <div className="pt-4 border-t border-white/10 text-left">
             <button
               onClick={onClose}
-              className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-colors ml-2"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
-
-        {/* Project Header Info */}
-        <div className="mb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
-          <div>
-            <div className="text-[11px] font-mono uppercase tracking-wider text-cyan-400 font-bold mb-1">
-              {project.client}
-            </div>
-            <h2 className="text-2xl sm:text-4xl font-display font-extrabold text-white">
-              {project.title}
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-300 mt-1 max-w-2xl">
-              {project.description}
-            </p>
-          </div>
-
-          {/* Quick Prev / Next Arrows */}
-          <div className="flex items-center gap-2 shrink-0">
-            <button
-              onClick={handlePrev}
-              title="Previous Project"
-              className="p-2.5 rounded-xl bg-white/5 hover:bg-white/15 border border-white/10 text-slate-300 hover:text-white transition-colors"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-            <button
-              onClick={handleNext}
-              title="Next Project"
-              className="p-2.5 rounded-xl bg-white/5 hover:bg-white/15 border border-white/10 text-slate-300 hover:text-white transition-colors"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-
-        {/* Multi-Device Showcase Mockup matching Panel 04 */}
-        <div className="relative mb-8 rounded-2xl overflow-hidden border border-white/15 shadow-2xl bg-gradient-to-b from-slate-900 via-slate-950 to-black group">
-          <div className="px-4 py-2.5 bg-slate-900/90 border-b border-white/10 flex items-center justify-between text-[10px] font-mono text-slate-400">
-            <div 
-              onClick={() => {
-                soundEffects.playClick();
-                if (project.liveUrl) window.open(project.liveUrl, '_blank');
-              }}
-              className="flex items-center gap-2 cursor-pointer hover:text-white transition-colors"
-              title="Click to visit live demo"
-            >
-              <span className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
-              <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80" />
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
-              <span className="ml-2 text-slate-300 hover:text-cyan-300 font-semibold truncate flex items-center gap-1.5">
-                <span>{project.liveUrl || `https://${project.id}.aetherstudios.dev`}</span>
-                <ExternalLink className="w-3 h-3 text-cyan-400" />
-              </span>
-            </div>
-
-            <button
-              onClick={() => {
-                soundEffects.playClick();
-                if (project.liveUrl) window.open(project.liveUrl, '_blank');
-              }}
-              className="text-cyan-300 bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-400/40 px-2.5 py-1 rounded-lg text-[10px] font-mono flex items-center gap-1.5 transition-colors"
-            >
-              <span>Launch Live Prototype</span>
-              <ExternalLink className="w-3 h-3" />
-            </button>
-          </div>
-
-          <div className="relative aspect-[16/9] sm:aspect-[21/9] w-full overflow-hidden">
-            <img 
-              src={displayImage} 
-              alt={project.title} 
-              className="w-full h-full object-cover object-center group-hover:scale-102 transition-transform duration-500" 
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
-            
-            {/* Live Metric Badge Overlaid */}
-            <div className="absolute bottom-4 left-4 z-10 flex items-center gap-2">
-              <div className="px-3 py-1.5 rounded-xl bg-slate-950/90 backdrop-blur-md border border-emerald-500/40 text-emerald-400 text-xs font-mono font-bold shadow-lg flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                <span>{project.metrics}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Project Detailed Sections Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8 text-xs">
-          
-          {/* Left: Overview & Key Features (7 Cols) */}
-          <div className="lg:col-span-7 space-y-6">
-            
-            {/* Overview */}
-            <div className="p-5 rounded-2xl bg-white/5 border border-white/10 space-y-2">
-              <h3 className="text-xs font-mono uppercase tracking-wider text-slate-400 font-bold">
-                Project Overview
-              </h3>
-              <p className="text-slate-300 leading-relaxed text-sm">
-                {project.overview || project.description}
-              </p>
-            </div>
-
-            {/* Key Features */}
-            {project.keyFeatures && (
-              <div className="p-5 rounded-2xl bg-white/5 border border-white/10 space-y-3">
-                <h3 className="text-xs font-mono uppercase tracking-wider text-slate-400 font-bold">
-                  Key Features
-                </h3>
-                <ul className="space-y-2.5">
-                  {project.keyFeatures.map((feat, idx) => (
-                    <li key={idx} className="flex items-start gap-2.5 text-slate-300 text-xs sm:text-sm">
-                      <div className="w-4 h-4 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
-                        <Check className="w-3 h-3 stroke-[3]" />
-                      </div>
-                      <span>{feat}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-          </div>
-
-          {/* Right: Tech Stack, Stats & Deliverables (5 Cols) */}
-          <div className="lg:col-span-5 space-y-6">
-            
-            {/* Technologies */}
-            <div className="p-5 rounded-2xl bg-white/5 border border-white/10 space-y-3">
-              <h3 className="text-xs font-mono uppercase tracking-wider text-slate-400 font-bold">
-                Technologies & Architecture
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {techList.map((t, idx) => (
-                  <span 
-                    key={idx} 
-                    className="px-2.5 py-1 rounded-lg bg-white/10 text-cyan-300 font-mono text-xs border border-white/10"
-                  >
-                    {t}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            {/* Performance & Execution Stats */}
-            {project.stats && (
-              <div className="p-5 rounded-2xl bg-white/5 border border-white/10 space-y-3">
-                <h3 className="text-xs font-mono uppercase tracking-wider text-slate-400 font-bold">
-                  Verified Performance
-                </h3>
-                <div className="grid grid-cols-3 gap-2">
-                  {project.stats.map((st, idx) => (
-                    <div key={idx} className="p-2.5 rounded-xl bg-black/40 border border-white/5 text-center">
-                      <div className="text-base font-display font-extrabold text-white">
-                        {st.value}
-                      </div>
-                      <div className="text-[10px] text-slate-400 font-mono mt-0.5 truncate">
-                        {st.label}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Testimonial Quote */}
-            {project.testimonial && (
-              <div className="p-5 rounded-2xl bg-purple-500/10 border border-purple-500/20 text-purple-200">
-                <p className="text-xs italic leading-relaxed mb-2">
-                  "{project.testimonial}"
-                </p>
-                <div className="text-[11px] font-mono text-purple-300 font-bold">
-                  — {project.client}
-                </div>
-              </div>
-            )}
-
-          </div>
-        </div>
-
-        {/* Thumbnail Strip of Other Projects */}
-        <div className="mb-8 pt-4 border-t border-white/10">
-          <div className="text-[11px] font-mono uppercase tracking-wider text-slate-400 font-bold mb-3">
-            More Projects in Our Portfolio:
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
-            {portfolioData.map((p) => {
-              const isSelected = p.id === project.id;
-              return (
-                <button
-                  key={p.id}
-                  onClick={() => {
-                    soundEffects.playClick();
-                    if (onSelectProject) onSelectProject(p);
-                  }}
-                  className={`group rounded-xl overflow-hidden border transition-all text-left relative aspect-[16/10] ${
-                    isSelected
-                      ? 'border-cyan-400 ring-2 ring-cyan-400/50 scale-105 shadow-lg'
-                      : 'border-white/10 opacity-60 hover:opacity-100 hover:scale-102'
-                  }`}
-                >
-                  <img src={p.image} alt={p.title} className="w-full h-full object-cover" />
-                  <div className="absolute inset-0 bg-black/50 group-hover:bg-black/20 transition-colors p-1.5 flex items-end">
-                    <span className="text-[9px] font-mono text-white truncate font-bold">
-                      {p.title}
-                    </span>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Modal Bottom Actions */}
-        <div className="pt-4 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={handlePrev}
-              className="flex items-center gap-1 text-xs font-mono text-slate-400 hover:text-white transition-colors"
+              className="flex items-center gap-2 text-xs font-mono text-slate-400 hover:text-white transition-colors"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Previous Project</span>
-            </button>
-            <span className="text-slate-600">•</span>
-            <button
-              onClick={handleNext}
-              className="flex items-center gap-1 text-xs font-mono text-slate-400 hover:text-white transition-colors"
-            >
-              <span>Next Project</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <span>Exit Showcase</span>
             </button>
           </div>
+        </aside>
 
-          <button
-            onClick={() => {
-              onClose();
-              onOpenIntake({ category: project.category, description: `Inspired by ${project.title}` });
-            }}
-            className="w-full sm:w-auto px-6 py-2.5 rounded-full font-display font-bold text-xs text-slate-950 bg-gradient-to-r from-[rgb(var(--color-primary))] to-[rgb(var(--color-secondary))] hover:opacity-95 shadow-md flex items-center justify-center gap-2"
-          >
-            <span>Request Similar Project</span>
-            <Sparkles className="w-3.5 h-3.5" />
-          </button>
+        {/* ================= MAIN CONTENT PANE ================= */}
+        <div className="flex-1 flex flex-col overflow-y-auto bg-[#040814]">
+          
+          {/* TOP BAR matching Mockup */}
+          <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between shrink-0 bg-[#050B1B]/80 backdrop-blur-md">
+            {/* Back to Projects */}
+            <button
+              onClick={onClose}
+              className="flex items-center gap-2 text-xs font-mono text-slate-300 hover:text-white transition-colors group"
+            >
+              <ArrowLeft className="w-4 h-4 text-cyan-400 group-hover:-translate-x-1 transition-transform" />
+              <span>Back to Projects</span>
+            </button>
+
+            {/* User Avatar */}
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2.5">
+                <img 
+                  src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" 
+                  alt="Avatar" 
+                  className="w-8 h-8 rounded-full object-cover border border-cyan-400/40"
+                />
+                <div className="hidden sm:flex flex-col text-left leading-tight">
+                  <span className="text-xs font-bold text-white">Omar Mohamed</span>
+                  <span className="text-[10px] font-mono text-slate-400">Client</span>
+                </div>
+              </div>
+
+              <button 
+                onClick={onClose}
+                className="p-1.5 rounded-xl hover:bg-white/10 text-slate-400 hover:text-white transition-colors ml-2"
+                title="Close"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+
+          {/* HERO BANNER with 3D AIRPLANE ARTWORK matching Mockup */}
+          <div className="relative p-6 sm:p-8 overflow-hidden min-h-[160px] flex flex-col justify-end text-left">
+            {/* Background 3D Airplane Flying Over Coastal Mountains */}
+            <div className="absolute inset-0 -z-10 overflow-hidden">
+              <img 
+                src="/aether_travel_airplane.jpg" 
+                alt="3D Travel Airplane Flight" 
+                className="w-full h-full object-cover object-center filter brightness-90 contrast-105"
+              />
+              {/* Cinematic Vignette */}
+              <div className="absolute inset-0 bg-gradient-to-r from-[#040814]/95 via-[#040814]/70 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#040814] via-transparent to-transparent" />
+            </div>
+
+            <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div>
+                <div className="flex items-center gap-3">
+                  <h1 className="text-2xl sm:text-4xl font-display font-extrabold text-white tracking-tight drop-shadow-md">
+                    Travel Platform
+                  </h1>
+                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 text-xs font-mono font-bold flex items-center gap-1.5 shadow-sm">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <span>In Progress</span>
+                  </span>
+                </div>
+
+                <p className="text-xs sm:text-sm text-slate-300 mt-1 max-w-xl font-normal drop-shadow-sm">
+                  A modern travel booking platform with hotels, flights, and attractions.
+                </p>
+              </div>
+
+              {/* Action Button: Preview Live Version ↗ */}
+              <button
+                onClick={handleLaunchLive}
+                className="px-5 py-2.5 rounded-xl font-display font-bold text-xs text-white bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-500 hover:opacity-95 shadow-[0_0_20px_rgba(147,51,234,0.4)] flex items-center gap-2 transition-all active:scale-[0.98] shrink-0"
+              >
+                <span>Preview Live Version</span>
+                <ExternalLink className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+
+          {/* MAIN TWO-COLUMN CONTAINER matching Mockup */}
+          <div className="p-6 sm:p-8 pt-2 grid grid-cols-1 xl:grid-cols-12 gap-6 text-left">
+            
+            {/* LEFT CONTAINER: Clean White Showcase Card with Device Mockup (8 Cols) */}
+            <div className="xl:col-span-8 bg-white text-slate-900 rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col justify-between">
+              
+              <div>
+                {/* Multi-Device Travel Mockup matching Mockup */}
+                <div className="rounded-2xl overflow-hidden border border-slate-200 bg-slate-950 shadow-md mb-6 relative group">
+                  <img 
+                    src="/ui_travel_multi_device.jpg" 
+                    alt="Travel Platform Multi-Device Experience" 
+                    className="w-full h-auto object-cover group-hover:scale-[1.01] transition-transform duration-500" 
+                  />
+                  
+                  {/* Subtle Interactive Hover Overlay */}
+                  <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <button
+                      onClick={handleLaunchLive}
+                      className="px-4 py-2 rounded-full bg-slate-950/90 text-white text-xs font-mono font-bold flex items-center gap-2 shadow-2xl hover:bg-cyan-500 hover:text-slate-950 transition-colors"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                      <span>Interact with Live Prototype</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* About This Project */}
+                <div className="mb-6">
+                  <h3 className="text-base font-display font-extrabold text-slate-950 mb-2">
+                    About This Project
+                  </h3>
+                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
+                    This project is a complete travel platform that allows users to search for hotels, flights, restaurants, and attractions. The platform includes a modern, responsive design, user accounts, and an easy booking process.
+                  </p>
+                </div>
+
+                {/* Technologies Used matching Mockup */}
+                <div>
+                  <h4 className="text-xs font-mono font-bold text-slate-500 uppercase tracking-wider mb-2.5">
+                    Technologies Used
+                  </h4>
+                  <div className="flex flex-wrap items-center gap-2">
+                    {[
+                      { name: 'Next.js', color: 'bg-slate-900 text-white' },
+                      { name: 'TypeScript', color: 'bg-blue-600 text-white' },
+                      { name: 'Tailwind CSS', color: 'bg-cyan-600 text-white' },
+                      { name: 'Supabase', color: 'bg-emerald-600 text-white' }
+                    ].map((tech) => (
+                      <span
+                        key={tech.name}
+                        className={`px-3 py-1 rounded-lg text-xs font-mono font-bold flex items-center gap-1.5 shadow-sm ${tech.color}`}
+                      >
+                        <span className="w-1.5 h-1.5 rounded-full bg-white/80" />
+                        <span>{tech.name}</span>
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            {/* RIGHT COLUMN: Project Progress Donut & Quick Info (4 Cols) */}
+            <div className="xl:col-span-4 space-y-6">
+              
+              {/* CARD 1: Project Progress with Circular Donut Chart 45% matching Mockup */}
+              <div className="p-6 rounded-3xl bg-[#090F20]/90 border border-white/10 shadow-lg">
+                <h3 className="text-base font-display font-bold text-white mb-4">
+                  Project Progress
+                </h3>
+
+                {/* Circular Donut Ring 45% */}
+                <div className="flex items-center gap-4 mb-5 pb-5 border-b border-white/10">
+                  <div className="relative w-16 h-16 shrink-0 flex items-center justify-center">
+                    <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                      {/* Track */}
+                      <path
+                        className="text-slate-800"
+                        strokeWidth="3.5"
+                        stroke="currentColor"
+                        fill="none"
+                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                      />
+                      {/* 45% Fill */}
+                      <path
+                        className="text-[#6366F1]"
+                        strokeDasharray="45, 100"
+                        strokeWidth="3.5"
+                        strokeLinecap="round"
+                        stroke="currentColor"
+                        fill="none"
+                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                      />
+                    </svg>
+                    <span className="absolute font-display font-extrabold text-sm text-white">
+                      45%
+                    </span>
+                  </div>
+
+                  <div className="text-xs">
+                    <div className="text-white font-bold">Stage 3: Frontend</div>
+                    <div className="text-slate-400 text-[11px]">Sprint progressing on schedule</div>
+                  </div>
+                </div>
+
+                {/* Checklist matching Mockup */}
+                <div className="space-y-3 text-xs">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                      <span className="text-slate-200">Project Setup</span>
+                    </div>
+                    <span className="text-[10px] font-mono text-emerald-400">Completed</span>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                      <span className="text-slate-200">UI/UX Design</span>
+                    </div>
+                    <span className="text-[10px] font-mono text-emerald-400">Completed</span>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-3.5 h-3.5 text-[#6366F1] shrink-0 animate-spin" />
+                      <span className="text-white font-bold">Frontend Development</span>
+                    </div>
+                    <span className="text-[10px] font-mono text-cyan-300 font-bold">In Progress</span>
+                  </div>
+
+                  <div className="flex items-center justify-between text-slate-500">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3.5 h-3.5 rounded-full border border-slate-700 shrink-0" />
+                      <span>Backend Development</span>
+                    </div>
+                    <span className="text-[10px] font-mono">Pending</span>
+                  </div>
+
+                  <div className="flex items-center justify-between text-slate-500">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3.5 h-3.5 rounded-full border border-slate-700 shrink-0" />
+                      <span>Testing & Bug Fixes</span>
+                    </div>
+                    <span className="text-[10px] font-mono">Pending</span>
+                  </div>
+
+                  <div className="flex items-center justify-between text-slate-500">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3.5 h-3.5 rounded-full border border-slate-700 shrink-0" />
+                      <span>Final Delivery</span>
+                    </div>
+                    <span className="text-[10px] font-mono">Pending</span>
+                  </div>
+                </div>
+
+              </div>
+
+              {/* CARD 2: Quick Info & View All Files Button matching Mockup */}
+              <div className="p-6 rounded-3xl bg-[#090F20]/90 border border-white/10 shadow-lg space-y-4">
+                <h3 className="text-base font-display font-bold text-white">
+                  Quick Info
+                </h3>
+
+                <div className="space-y-3 text-xs">
+                  <div className="flex items-center justify-between pb-2 border-b border-white/5">
+                    <span className="text-slate-400">Type</span>
+                    <span className="text-white font-medium">Web Application</span>
+                  </div>
+
+                  <div className="flex items-center justify-between pb-2 border-b border-white/5">
+                    <span className="text-slate-400">Estimated Delivery</span>
+                    <span className="font-mono text-slate-300">Oct 15, 2025</span>
+                  </div>
+
+                  <div className="flex items-center justify-between pb-1">
+                    <span className="text-slate-400">Budget</span>
+                    <span className="font-mono text-emerald-400 font-bold text-sm">$599</span>
+                  </div>
+                </div>
+
+                {/* Primary Pill Button: View All Files → matching Mockup */}
+                <button
+                  onClick={handleDownloadFiles}
+                  className="w-full mt-2 py-3 rounded-xl font-display font-bold text-xs text-white bg-gradient-to-r from-[#4F46E5] via-[#6366F1] to-[#A855F7] hover:opacity-95 shadow-[0_0_20px_rgba(99,102,241,0.35)] flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
+                >
+                  <span>View All Files</span>
+                  <span>→</span>
+                </button>
+              </div>
+
+            </div>
+
+          </div>
+
         </div>
 
       </div>
+
+      {/* Files Manifest Overlay */}
+      {isFilesModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-150">
+          <div className="bg-[#090E1E] border border-cyan-400/30 max-w-lg w-full rounded-2xl p-6 shadow-2xl text-left text-slate-100">
+            <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-4">
+              <h4 className="text-base font-bold text-white">Project Deliverables & Repository</h4>
+              <button onClick={() => setIsFilesModalOpen(false)} className="p-1 rounded-lg text-slate-400 hover:text-white">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="space-y-2.5 text-xs mb-5">
+              {[
+                { name: 'frontend-source-v1.4.zip', size: '14.2 MB', tag: 'Next.js App' },
+                { name: 'database-supabase-schema.sql', size: '240 KB', tag: 'PostgreSQL' },
+                { name: 'figma-design-tokens-v2.fig', size: '48.6 MB', tag: 'UI Kit' },
+                { name: 'commercial-license-handover.pdf', size: '1.1 MB', tag: 'IP Deed' }
+              ].map((f) => (
+                <div key={f.name} className="flex items-center justify-between p-2.5 rounded-xl bg-white/5 border border-white/10">
+                  <div className="flex items-center gap-2 truncate">
+                    <FileText className="w-4 h-4 text-cyan-400 shrink-0" />
+                    <span className="truncate text-slate-200">{f.name}</span>
+                  </div>
+                  <span className="text-[10px] font-mono text-slate-400 shrink-0">{f.size}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex items-center justify-end gap-3">
+              <button onClick={() => setIsFilesModalOpen(false)} className="px-4 py-2 text-xs font-mono text-slate-400 hover:text-white">
+                Close
+              </button>
+              <button onClick={handleDownloadFiles} className="px-4 py-2 rounded-xl bg-cyan-400 text-slate-950 font-mono text-xs font-bold hover:bg-cyan-300 flex items-center gap-1.5">
+                <Download className="w-3.5 h-3.5" />
+                <span>Download All Files (.zip)</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
