@@ -55,38 +55,16 @@ export default function AuthCanvas3D({ mode = 'signin', theme = 'cyan' }) {
     partGeo.setAttribute('color', new THREE.BufferAttribute(partColors, 3));
 
     const partMat = new THREE.PointsMaterial({
-      size: 0.22,
+      size: 0.18,
       vertexColors: true,
       transparent: true,
-      opacity: 0.75,
+      opacity: 0.65,
       blending: THREE.AdditiveBlending,
     });
     const particleSystem = new THREE.Points(partGeo, partMat);
     scene.add(particleSystem);
 
-    // 3. Subtle Floating Orbiting Glass Orbs
-    const orbGroup = new THREE.Group();
-    const orbCount = 3;
-    const orbMeshes = [];
-    const orbGeo = new THREE.SphereGeometry(0.35, 16, 16);
-    const orbMat = new THREE.MeshBasicMaterial({
-      color: 0x93c5fd,
-      wireframe: true,
-      transparent: true,
-      opacity: 0.45,
-    });
-
-    for (let i = 0; i < orbCount; i++) {
-      const mesh = new THREE.Mesh(orbGeo, orbMat);
-      const angle = (i / orbCount) * Math.PI * 2;
-      const radius = 7.5 + (i * 1.5);
-      mesh.position.set(Math.cos(angle) * radius, (i - 1) * 2.2, Math.sin(angle) * radius);
-      orbMeshes.push({ mesh, angle, speed: 0.008 + i * 0.004, radius });
-      orbGroup.add(mesh);
-    }
-    scene.add(orbGroup);
-
-    // 4. Input handling
+    // 3. Input handling
     let winWidth = window.innerWidth || 1920;
     let winHeight = window.innerHeight || 1080;
     let mouseThrottle = 0;
@@ -117,7 +95,7 @@ export default function AuthCanvas3D({ mode = 'signin', theme = 'cyan' }) {
 
     window.addEventListener('resize', handleResize, { passive: true });
 
-    // 5. Render loop
+    // 4. Render loop
     let animId = null;
     let clock = new THREE.Clock();
 
@@ -129,18 +107,11 @@ export default function AuthCanvas3D({ mode = 'signin', theme = 'cyan' }) {
       mouseRef.current.x += (mouseRef.current.targetX - mouseRef.current.x) * 0.035;
       mouseRef.current.y += (mouseRef.current.targetY - mouseRef.current.y) * 0.035;
 
-      particleSystem.rotation.y = elapsed * 0.015 + mouseRef.current.x * 0.05;
-      particleSystem.rotation.x = mouseRef.current.y * 0.04;
+      particleSystem.rotation.y = elapsed * 0.01 + mouseRef.current.x * 0.04;
+      particleSystem.rotation.x = mouseRef.current.y * 0.03;
 
-      orbMeshes.forEach((item) => {
-        item.angle += item.speed;
-        item.mesh.position.x = Math.cos(item.angle) * item.radius;
-        item.mesh.position.z = Math.sin(item.angle) * item.radius;
-        item.mesh.position.y += Math.sin(elapsed * 2 + item.angle) * 0.01;
-      });
-
-      camera.position.x = mouseRef.current.x * 0.8;
-      camera.position.y = mouseRef.current.y * 0.5;
+      camera.position.x = mouseRef.current.x * 0.6;
+      camera.position.y = mouseRef.current.y * 0.4;
       camera.lookAt(0, 0, 0);
 
       renderer.render(scene, camera);
@@ -158,8 +129,6 @@ export default function AuthCanvas3D({ mode = 'signin', theme = 'cyan' }) {
       renderer.dispose();
       partGeo.dispose();
       partMat.dispose();
-      orbGeo.dispose();
-      orbMat.dispose();
     };
   }, [mode, theme]);
 

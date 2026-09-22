@@ -189,48 +189,51 @@ export default function AuthPage({
   const isLogin = activeTab === 'signin';
 
   return (
-    <div className="min-h-screen bg-[#03060E] text-slate-100 flex flex-col relative overflow-x-hidden selection:bg-cyan-500/20 selection:text-cyan-300 font-sans">
+    <div className="min-h-screen w-full bg-[#020409] text-slate-100 flex items-center justify-center p-2 sm:p-6 lg:p-8 relative overflow-hidden font-sans select-none selection:bg-cyan-500/20 selection:text-cyan-300">
       
       {/* 3D Dynamic Stardust Canvas */}
       <AuthCanvas3D mode={activeTab} theme={currentTheme} />
 
-      {/* Top Header with Logo only matching Mockup */}
-      <header className="relative z-30 w-full max-w-7xl mx-auto px-6 sm:px-10 pt-7 pb-2 flex items-center justify-between">
-        <div 
-          onClick={onBack} 
-          className="cursor-pointer"
-          title="Return to Studio Home"
-        >
-          <AetherLogo showText={true} />
-        </div>
+      {/* Sleek App Window Frame matching Mockup */}
+      <div className="w-full max-w-[1340px] min-h-[760px] sm:min-h-[780px] rounded-2xl sm:rounded-[32px] bg-[#040816]/95 border border-white/10 shadow-[0_30px_100px_rgba(0,0,0,0.95)] backdrop-blur-3xl relative overflow-hidden flex flex-col justify-between p-6 sm:p-10 z-20">
 
-        {/* Clean top return link */}
-        <button
-          onClick={onBack}
-          className="text-xs font-mono text-slate-400 hover:text-white transition-colors"
-        >
-          ← Return to Home
-        </button>
-      </header>
+        {/* Top Header with Logo only matching Mockup */}
+        <header className="relative z-30 w-full flex items-center justify-between pb-3">
+          <div 
+            onClick={onBack} 
+            className="cursor-pointer"
+            title="Return to Studio Home"
+          >
+            <AetherLogo showText={true} />
+          </div>
 
-      {/* Main Dual-Stage Content Grid matching Mockup */}
-      <main className="relative z-20 flex-grow flex items-center justify-center py-6 sm:py-10 px-4 sm:px-8">
-        <div className="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center">
-          
-          {/* ================= LEFT COLUMN matching Mockup ================= */}
-          <div className="lg:col-span-7 relative flex flex-col justify-between text-left min-h-[560px]">
+          {/* Clean top return link */}
+          <button
+            onClick={onBack}
+            className="text-xs font-mono text-slate-400 hover:text-white transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-xl hover:bg-white/5 border border-transparent hover:border-white/10"
+          >
+            ← Return to Home
+          </button>
+        </header>
+
+        {/* Main Dual-Stage Content Grid matching Mockup */}
+        <main className="relative z-20 flex-grow flex items-center justify-center py-4 my-auto">
+          <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 items-center">
             
-            {/* Prominent 3D Background Artwork matching Mockup */}
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-full max-w-[500px] h-[480px] -z-10 overflow-hidden pointer-events-none opacity-95">
-              <img 
-                src={isLogin ? '/aether_auth_login_art.jpg' : '/aether_auth_signup_art.jpg'} 
-                alt={isLogin ? '3D Aether Monolith' : '3D Aether Crystal'}
-                className="w-full h-full object-contain filter drop-shadow-[0_0_40px_rgba(0,242,254,0.35)] scale-105 transition-all duration-700"
-              />
-            </div>
+            {/* ================= LEFT COLUMN matching Mockup ================= */}
+            <div className="lg:col-span-7 relative flex flex-col justify-between text-left min-h-[540px]">
+              
+              {/* Seamless 3D Artwork (Zero hard borders, radial mask + screen blend) */}
+              <div className="absolute right-[-6%] sm:right-[-2%] lg:right-[2%] top-1/2 -translate-y-1/2 w-[440px] sm:w-[500px] lg:w-[560px] h-[440px] sm:h-[500px] lg:h-[560px] pointer-events-none -z-10 flex items-center justify-center select-none">
+                <img 
+                  src={isLogin ? '/aether_auth_login_art.jpg' : '/aether_auth_signup_art.jpg'} 
+                  alt={isLogin ? '3D Aether Monolith' : '3D Aether Crystal'}
+                  className="w-full h-full object-contain [mask-image:radial-gradient(circle_at_center,black_35%,rgba(0,0,0,0.85)_55%,transparent_72%)] [-webkit-mask-image:radial-gradient(circle_at_center,black_35%,rgba(0,0,0,0.85)_55%,transparent_72%)] mix-blend-screen drop-shadow-[0_0_50px_rgba(0,242,254,0.35)] scale-110 pointer-events-none select-none transition-all duration-700"
+                />
+              </div>
 
-            {/* Top Text Content matching Mockup */}
-            <div className="space-y-4 pt-2 relative z-10 max-w-md">
+              {/* Top Text Content matching Mockup */}
+              <div className="space-y-4 pt-2 relative z-10 max-w-[360px]">
               
               {/* Cyan Tag Pill matching Mockup */}
               <div className="inline-flex items-center gap-1.5 text-xs font-mono font-bold tracking-wider text-cyan-400">
@@ -683,6 +686,7 @@ export default function AuthPage({
         </div>
       </main>
 
+      </div>
     </div>
   );
 }
